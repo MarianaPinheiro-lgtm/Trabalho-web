@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Minhas Inscrições{% endblock %}
+
+{% block content %}
+<h2>Minhas Inscrições</h2>
+<table>
+    <tr>
+        <th>Evento</th>
+        <th>Data</th>
+        <th>Status</th>
+        <th>Certificado</th>
+    </tr>
+    {% for inscricao in inscricoes %}
+    <tr>
+        <td>{{ inscricao.evento.nome }}</td>
+        <td>{{ inscricao.evento.data_inicio }}</td>
+        <td>{{ inscricao.get_status_display }}</td>
+        <td><a href="{% url 'certificado' inscricao.id %}">Ver Certificado</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">Você não possui inscrições.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

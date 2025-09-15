@@ -1,0 +1,9 @@
+{% block content %}
+<h2>Certificado de Participação</h2>
+
+<p><strong>Participante:</strong> {{ inscricao.usuario.username }}</p>
+<p><strong>Evento:</strong> {{ inscricao.evento.nome }}</p>
+<p><strong>Data do Evento:</strong> {{ inscricao.evento.data_inicio }}</p>
+<p><strong>Status:</strong> {{ inscricao.get_status_display }}</p>
+<p><strong>Emitido em:</strong> {{ certificado.data_emissao }}</p>
+{% endblock %}

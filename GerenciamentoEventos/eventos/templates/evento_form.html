@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if object %}Editar Evento{% else %}Criar Evento{% endif %}{% endblock %}
+
+{% block content %}
+<h2>{% if object %}Editar{% else %}Criar{% endif %} Evento</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if object %}Atualizar{% else %}Criar{% endif %}</button>
+</form>
+
+<a href="{% url 'evento_list' %}">Voltar para lista de eventos</a>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Eventos{% endblock %}
+
+{% block content %}
+<h2>Lista de Eventos</h2>
+
+{% if user.is_authenticated and perfil.tipo == 'organizador' %}
+    <a href="{% url 'evento_create' %}">Criar Novo Evento</a>
+{% endif %}
+
+<table>
+    <tr>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Data Início</th>
+        <th>Local</th>
+        <th>Ações</th>
+    </tr>
+    {% for evento in eventos %}
+    <tr>
+        <td>{{ evento.nome }}</td>
+        <td>{{ evento.get_tipo_display }}</td>
+        <td>{{ evento.data_inicio }}</td>
+        <td>{{ evento.local }}</td>
+        <td>
+            {% if user == evento.organizador %}
+                <a href="{% url 'evento_update' evento.id %}">Editar</a> |
+                <a href="{% url 'evento_delete' evento.id %}">Excluir</a>
+            {% endif %}
+            <a href="{% url 'inscricao_create' %}">Inscrever-se</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5">Nenhum evento cadastrado.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

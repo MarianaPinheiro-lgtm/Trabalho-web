@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Inscrição{% endblock %}
+
+{% block content %}
+<h2>Inscrever-se no Evento</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Inscrever</button>
+</form>
+<a href="{% url 'minhas-inscricoes' %}">Ver minhas inscrições</a>
+{% endblock %}
