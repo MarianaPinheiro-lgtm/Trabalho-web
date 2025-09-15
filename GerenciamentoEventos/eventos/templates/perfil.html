@@ -12,12 +12,11 @@
 
 <hr>
 
-<h3>Opções</h3>
-<ul>
-    <li><a href="{% url 'evento_list' %}">Ver eventos</a></li>
     {% if perfil.tipo == 'organizador' %}
-        <li><a href="{% url 'evento_create' %}">Criar evento</a></li>
+    <h3>Opções</h3>
+    <ul>
+    <li><a href="{% url 'evento_create' %}">Criar evento</a></li>
+    </ul>
     {% endif %}
-    <li><a href="{% url 'minhas-inscricoes' %}">Minhas inscrições</a></li>
-</ul>
+
 {% endblock %}
