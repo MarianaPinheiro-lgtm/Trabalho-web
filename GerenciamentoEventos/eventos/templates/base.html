@@ -5,63 +5,98 @@
     <meta charset="UTF-8">
     <title>{% block title %}Meu Sistema{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
-        /* Estilo básico e simples */
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            color: #333;
+            line-height: 1.6;
         }
+
         header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: #fff;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
-        nav a {
-            color: white;
+
+        header h1 {
+            font-size: 1.5rem;
+        }
+
+        nav a,
+        nav form button {
+            color: #fff;
             text-decoration: none;
-            margin-right: 15px;
+            margin-left: 15px;
+            font-size: 0.95rem;
         }
-        nav a:hover {
+
+        nav a:hover,
+        nav form button:hover {
             text-decoration: underline;
         }
+
+        nav form {
+            display: inline;
+        }
+
         main {
             padding: 20px;
+            min-height: calc(100vh - 120px); /* espaço p/ header e footer */
         }
-        footer {
-            background-color: #ddd;
-            color: #333;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
+
         .container {
             max-width: 800px;
             margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 5px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
+
         button {
             padding: 10px 15px;
             border: none;
             border-radius: 5px;
-            background-color: #4CAF50;
+            background-color: #27ae60;
             color: white;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
+
         button:hover {
-            background-color: #45a049;
+            background-color: #219150;
         }
+
         input, select {
-            padding: 8px;
+            padding: 10px;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             border-radius: 5px;
             border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.9rem;
+            position: relative;
+            bottom: 0;
+            width: 100%;
         }
     </style>
 </head>
@@ -73,11 +108,9 @@
             <a href="{% url 'evento_list' %}">Eventos</a>
             <a href="{% url 'minhas-inscricoes' %}">Minhas Inscrições</a>
             {% if user.is_authenticated %}
-                <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                 {% csrf_token %}
-                <button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 0; font: inherit; text-decoration: underline;">
-                    Sair
-                </button>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Sair</button>
                 </form>
             {% else %}
                 <a href="{% url 'login' %}">Entrar</a>
@@ -85,11 +118,13 @@
             {% endif %}
         </nav>
     </header>
+
     <main>
         <div class="container">
             {% block content %}{% endblock %}
         </div>
     </main>
+
     <footer>
         &copy; 2025 Meu Sistema de Eventos
     </footer>

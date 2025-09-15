@@ -1,13 +1,86 @@
-{% extends 'base.html' %}
 
-{% block title %}Registro{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% extends 'base.html' %}
+
+{% block title %}Registrar{% endblock %}
 
 {% block content %}
-<h2>Registro</h2>
+<div class="form-container">
+    <h2>Crie sua conta</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrar</button>
+    </form>
+    <p class="redirect">
+        Já tem conta? <a href="{% url 'login' %}">Entrar</a>
+    </p>
+</div>
+
+<style>
+    .form-container {
+        max-width: 400px;
+        margin: auto;
+        text-align: center;
+    }
+
+    .form-container h2 {
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    .form-container form {
+        text-align: left;
+    }
+
+    .form-container button {
+        width: 100%;
+        margin-top: 10px;
+        font-size: 1rem;
+    }
+
+    .redirect {
+        margin-top: 15px;
+        font-size: 0.9rem;
+    }
+
+    .redirect a {
+        color: #27ae60;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .redirect a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+</head>
+<body>
+
+<header>
+    <h1>Eventos Acadêmicos</h1>
+</header>
+
+<main>
+    <h2>Registro</h2>
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit">Registrar</button>
 </form>
 <p>Já tem conta? <a href="{% url 'login' %}">Entrar</a></p>
-{% endblock %}
+</main>
+
+<footer>
+    &copy; {{ year|default:"2025" }} Sistema de Eventos. Todos os direitos reservados.
+</footer>
+
+</body>
+</html>

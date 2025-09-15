@@ -33,14 +33,14 @@ urlpatterns = [
     path('admin/', admin.site.urls),
       # Autenticação
     path('registro/', RegistroView.as_view(), name='registro'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
 
     # Perfil
     path('perfil/', PerfilView.as_view(), name='perfil'),
 
     # Eventos
-    path('', EventoListView.as_view(), name='evento_list'),
+    path('evento/listas', EventoListView.as_view(), name='evento_list'),
     path('evento/criar/', EventoCreateView.as_view(), name='evento_create'),
     path('evento/<int:pk>/editar/', EventoUpdateView.as_view(), name='evento_update'),
     path('evento/<int:pk>/excluir/', EventoDeleteView.as_view(), name='evento_delete'),
@@ -48,7 +48,6 @@ urlpatterns = [
     # Inscrições
     path('inscricao/criar/', InscricaoCreateView.as_view(), name='inscricao_create'),
     path('inscricoes/', InscricaoListView.as_view(), name='minhas-inscricoes'),
-
     # Certificado
     path('certificado/<int:pk>/', CertificadoView.as_view(), name='certificado'),
 
