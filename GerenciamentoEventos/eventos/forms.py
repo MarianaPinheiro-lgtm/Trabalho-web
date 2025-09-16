@@ -8,7 +8,7 @@ from .models import Evento, Inscricao, Perfil, Certificado
 class RegistroForm(forms.ModelForm):
     telefone = forms.CharField(max_length=15, required=True)
     instituicao = forms.CharField(max_length=100, required=False)
-    tipo = forms.ChoiceField(choices=Perfil.TIPOS[0:2], required=True)
+    tipo = forms.ChoiceField(choices=Perfil.TIPOS, required=True)
 
     password = forms.CharField(
         label="Senha",
