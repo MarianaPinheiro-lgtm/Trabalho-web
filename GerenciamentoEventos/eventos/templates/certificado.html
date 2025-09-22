@@ -1,9 +1,33 @@
 {% block content %}
-<h2>Certificado de Participação</h2>
+<div style="height: 100vh; display: flex; justify-content: center; align-items: center; background: #f0f4ff; font-family: 'Poppins', Arial, sans-serif;">
+    <div class="card shadow-lg text-center"
+         style="max-width: 900px; width: 100%; padding: 60px; border: 6px solid #0d6efd; border-radius: 30px; background: #fff;">
+        
+        <h2 style="font-size: 3rem; font-family: 'Georgia', serif; font-weight: bold; color: #0d6efd; margin-bottom: 30px;">
+             Certificado de Participação
+        </h2>
 
-<p><strong>Participante:</strong> {{ inscricao.usuario.username }}</p>
-<p><strong>Evento:</strong> {{ inscricao.evento.nome }}</p>
-<p><strong>Data do Evento:</strong> {{ inscricao.evento.data_inicio }}</p>
-<p><strong>Status:</strong> {{ inscricao.get_status_display }}</p>
-<p><strong>Emitido em:</strong> {{ certificado.data_emissao }}</p>
+        <p style="font-size: 1.3rem; color: #444;">Certificamos que</p>
+
+        <h1 style="font-family: 'Georgia', serif; font-size: 2.8rem; font-weight: bold; color: #222; margin: 20px 0;">
+            {{ inscricao.usuario.get_full_name|default:inscricao.usuario.username }}
+        </h1>
+
+        <p style="font-size: 1.3rem; color: #444;">participou do evento</p>
+
+        <h2 style="font-family: 'Georgia', serif; font-size: 2rem; font-weight: 600; color: #0d6efd; margin: 15px 0 40px;">
+            “{{ inscricao.evento.nome }}”
+        </h2>
+
+        <div style="font-size: 1.1rem; color: #333; line-height: 1.8;">
+            <p><strong>Tipo:</strong> {{ inscricao.evento.get_tipo_display }}</p>
+            <p><strong>Data do Evento:</strong> {{ inscricao.evento.data_inicio|date:"d/m/Y" }}</p>
+            <p><strong>Status:</strong> {{ inscricao.get_status_display }}</p>
+        </div>
+
+        <div style="margin-top: 50px; color: #666; font-size: 0.9rem;">
+            <em>Emitido em {{ certificado.data_emissao|date:"d/m/Y H:i" }}</em>
+        </div>
+    </div>
+</div>
 {% endblock %}

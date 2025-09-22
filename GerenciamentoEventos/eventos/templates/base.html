@@ -104,7 +104,11 @@
     <header>
         <h1>Eventos Acadêmicos</h1>
         <nav>
-            <a href="{% url 'perfil' %}">Perfil</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'perfil' %}">Perfil</a>
+            {% else %}
+                <a href="{% url 'login' %}?next={% url 'perfil' %}">Perfil</a>
+            {% endif %}
             <a href="{% url 'evento_list' %}">Eventos</a>
             <a href="{% url 'minhas-inscricoes' %}">Minhas Inscrições</a>
             {% if user.is_authenticated %}

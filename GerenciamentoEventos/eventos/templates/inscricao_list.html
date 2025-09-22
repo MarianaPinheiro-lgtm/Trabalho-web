@@ -3,23 +3,79 @@
 {% block title %}Minhas Inscrições{% endblock %}
 
 {% block content %}
-<h2>Minhas Inscrições</h2>
-<table>
-    <tr>
-        <th>Evento</th>
-        <th>Data</th>
-        <th>Status</th>
-        <th>Certificado</th>
-    </tr>
-    {% for inscricao in inscricoes %}
-    <tr>
-        <td>{{ inscricao.evento.nome }}</td>
-        <td>{{ inscricao.evento.data_inicio }}</td>
-        <td>{{ inscricao.get_status_display }}</td>
-        <td><a href="{% url 'certificado' inscricao.id %}">Ver Certificado</a></td>
-    </tr>
-    {% empty %}
-    <tr><td colspan="4">Você não possui inscrições.</td></tr>
-    {% endfor %}
-</table>
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-lg p-4 w-100" style="max-width: 950px;">
+        <h2 class="mb-4 text-center fw-bold text-primary">📋 Minhas Inscrições</h2>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-center shadow-sm">
+                <thead class="table-primary text-dark">
+                    <tr>
+                        <th class="py-3 px-4"> Evento</th>
+                        <th class="py-3 px-4"> Data</th>
+                        <th class="py-3 px-4"> Status</th>
+                        <th class="py-3 px-4"> Certificado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscricao in inscricoes %}
+                    <tr>
+                        <td class="fw-semibold text-start ps-4">{{ inscricao.evento.nome }}</td>
+                        <td>{{ inscricao.evento.data_inicio|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge px-3 py-2 fs-6
+                                {% if inscricao.status == 'inscrito' %} bg-success
+                                {% elif inscricao.status == 'cancelado' %} bg-danger
+                                {% elif inscricao.status == 'presente' %} bg-info
+                                {% else %} bg-secondary
+                                {% endif %}">
+                                {{ inscricao.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'certificado' inscricao.id %}" 
+                               class="btn btn-sm btn-outline-primary fw-semibold rounded-pill shadow-sm px-3">
+                               🎓 Ver Certificado
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-muted py-4">
+                            Você não possui inscrições no momento.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Deixa os cabeçalhos bem destacados */
+    thead th {
+        font-weight: 600;
+        background: linear-gradient(180deg, #e9f2ff, #d6e9ff);
+        border-bottom: 2px solid #0d6efd !important;
+    }
+
+    /* Ajusta espaçamento das células */
+    tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    /* Hover suave nas linhas */
+    tbody tr:hover {
+        background-color: #f8fbff;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    /* Botão com efeito de destaque */
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: #fff;
+    }
+</style>
 {% endblock %}
