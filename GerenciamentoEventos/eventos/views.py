@@ -67,11 +67,19 @@ class EventoDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         evento = self.get_object()
         return self.request.user == evento.organizador  # só o organizador pode excluir
+        
 class EventoListView(ListView):
     model = Evento
     template_name = 'evento_list.html'  # Caminho para o template
     context_object_name = 'eventos'     # Nome da variável usada no template
     ordering = ['data_inicio']          # Ordena os eventos por data de início
+
+class EventoListView2(ListView):
+    model = Evento
+    template_name = 'evento_list2.html'  # Caminho para o template
+    context_object_name = 'eventos'     # Nome da variável usada no template
+    ordering = ['data_inicio']          # Ordena os eventos por data de início
+
 class InscricaoCreateView(CreateView):
     model = Inscricao
     form_class = InscricaoForm

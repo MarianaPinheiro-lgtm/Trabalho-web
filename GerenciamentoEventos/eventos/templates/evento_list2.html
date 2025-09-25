@@ -1,0 +1,75 @@
+{% extends 'baseSemLoginSair.html' %}
+
+{% block title %}Eventos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">Lista de Eventos</h2>
+        {% if user.is_authenticated and perfil.tipo == 'organizador' %}
+            <a href="{% url 'evento_create' %}" class="btn btn-success shadow-sm">
+                ➕ Criar Novo Evento
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle shadow-sm">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th scope="col" class="px-3 py-2">Nome</th>
+                    <th scope="col" class="px-3 py-2">Tipo</th>
+                    <th scope="col" class="px-3 py-2">Data Início</th>
+                    <th scope="col" class="px-3 py-2">Local</th>
+                    <th scope="col" class="px-3 py-2">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td class="fw-semibold text-dark">{{ evento.nome }}</td>
+                    <td class="text-muted">{{ evento.get_tipo_display }}</td>
+                    <td class="text-center">{{ evento.data_inicio|date:"d/m/Y" }}</td>
+                    <td class="text-muted">{{ evento.local }}</td>
+                    <td class="text-center">
+                        {% if user == evento.organizador %}
+                            <a href="{% url 'evento_update' evento.id %}" class="btn btn-sm btn-outline-warning me-1">
+                                 Editar
+                            </a>
+                            <a href="{% url 'evento_delete' evento.id %}" class="btn btn-sm btn-outline-danger me-1">
+                                 Excluir
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'inscricao_create' %}" class="btn btn-sm btn-outline-success">
+                             Inscrever-se
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-3">
+                        Nenhum evento cadastrado.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* Deixa cada coluna mais destacada */
+    table th {
+        background: linear-gradient(180deg, #e9f2ff, #d6e9ff);
+        font-weight: 600;
+        border-bottom: 2px solid #0d6efd !important;
+    }
+    table td {
+        vertical-align: middle;
+        padding: 0.75rem;
+    }
+    table tr:hover td {
+        background-color: #f8fbff;
+    }
+</style>
+{% endblock %}

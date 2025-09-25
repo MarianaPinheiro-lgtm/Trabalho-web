@@ -25,6 +25,7 @@ from eventos.views import (
     EventoUpdateView,
     EventoDeleteView,
     EventoListView,
+    EventoListView2,
     InscricaoCreateView,
     InscricaoListView,
     CertificadoView
@@ -40,7 +41,8 @@ urlpatterns = [
     path('perfil/', PerfilView.as_view(), name='perfil'),
 
     # Eventos
-    path('evento/listas', EventoListView.as_view(), name='evento_list'),
+    path('evento/listas/', EventoListView.as_view(), name='evento_list'),
+    path('evento/listas2/', EventoListView2.as_view(), name='evento_list2'),
     path('evento/criar/', EventoCreateView.as_view(), name='evento_create'),
     path('evento/<int:pk>/editar/', EventoUpdateView.as_view(), name='evento_update'),
     path('evento/<int:pk>/excluir/', EventoDeleteView.as_view(), name='evento_delete'),
