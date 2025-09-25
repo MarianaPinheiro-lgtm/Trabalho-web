@@ -8,8 +8,8 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">{% if object %}Atualizar{% else %}Criar{% endif %}</button>
+    <button type="submit" class="buttonInscricao">{% if object %}Atualizar{% else %}Criar{% endif %}</button>
 </form>
 
-<a href="{% url 'evento_list' %}">Voltar para lista de eventos</a>
+<a href="{% url 'evento_list' %}" class="buttonInscricao">Voltar para lista de eventos</a>
 {% endblock %}

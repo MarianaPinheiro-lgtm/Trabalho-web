@@ -44,7 +44,7 @@
 
         nav a:hover,
         nav form button:hover {
-            text-decoration: underline;
+            text-decoration: none;
         }
 
         nav form {
@@ -63,6 +63,22 @@
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .buttonH {
+            background-color: #27ae60;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .buttonH:hover{
+            background-color: #219150;
+            color: #2c3e50;
+            transform: scale(1.10);
         }
 
         button {
@@ -104,8 +120,8 @@
     <header>
         <h1>Eventos Acadêmicos</h1>
         <nav>
-        <a href="{% url 'login' %}">Entrar</a>
-        <a href="{% url 'evento_list2' %}">Eventos</a>
+        <a href="{% url 'login' %}" class="buttonH">Entrar</a>
+        <a href="{% url 'evento_list2' %}" class="buttonH">Eventos</a>
         </nav>
     </header>
 

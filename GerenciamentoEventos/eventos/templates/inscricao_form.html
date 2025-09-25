@@ -7,7 +7,7 @@
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Inscrever</button>
+    <button type="submit" class="buttonInscricao">Inscrever</button>
 </form>
-<a href="{% url 'minhas-inscricoes' %}">Ver minhas inscrições</a>
+<a href="{% url 'minhas-inscricoes' %}" class="buttonInscricao">Ver minhas inscrições</a>
 {% endblock %}
