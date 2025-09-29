@@ -33,6 +33,8 @@ class RegistroForm(forms.ModelForm):
         model = User 
         fields = ['username', 'first_name', 'email', 'password']
 
+    email = forms.EmailField(required=True)
+
     def clean_password_confirm(self):
         senha = self.cleaned_data.get("password") 
         senha_confirm = self.cleaned_data.get("password_confirm") 
@@ -47,6 +49,12 @@ class RegistroForm(forms.ModelForm):
         Perfil.objects.create( usuario=user, telefone=self.cleaned_data['telefone'], instituicao=self.cleaned_data['instituicao'], tipo=self.cleaned_data['tipo'] ) 
         return user
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("E-mail já cadastrado. Use outro endereço.")
+        return email
+    
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         label="Usuário",

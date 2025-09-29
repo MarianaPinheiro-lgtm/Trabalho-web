@@ -21,7 +21,6 @@
                     <th scope="col" class="px-3 py-2">Tipo</th>
                     <th scope="col" class="px-3 py-2">Data Início</th>
                     <th scope="col" class="px-3 py-2">Local</th>
-                    <th scope="col" class="px-3 py-2">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,9 +39,6 @@
                                  Excluir
                             </a>
                         {% endif %}
-                        <a href="{% url 'inscricao_create' %}" class="btn btn-sm btn-outline-success">
-                             Inscrever-se
-                        </a>
                     </td>
                 </tr>
                 {% empty %}
