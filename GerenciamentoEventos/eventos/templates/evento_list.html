@@ -27,28 +27,28 @@
             <tbody>
                 {% for evento in eventos %}
                 <tr>
-                    <td class="fw-semibold text-dark">{{ evento.nome }}</td>
-                    <td class="text-muted">{{ evento.get_tipo_display }}</td>
-                    <td class="text-center">{{ evento.data_inicio|date:"d/m/Y" }}</td>
-                    <td class="text-muted">{{ evento.local }}</td>
+                    <td class="fw-semibold text-dark"><strong>{{ evento.nome }}</strong></td>
+                    <td class="text-muted"><strong>{{ evento.get_tipo_display }}</strong></td>
+                    <td class="text-center"><strong>{{ evento.data_inicio|date:"d/m/Y" }}</strong></td>
+                    <td class="text-muted"><strong>{{ evento.local }}</strong></td>
                     <td class="text-center">
+                        <a href="{% url 'inscricao_create' %}" class="buttonEvento">
+                            Inscrever-se
+                       </a>
                         {% if user == evento.organizador %}
-                            <a href="{% url 'evento_update' evento.id %}" class="btn btn-sm btn-outline-warning me-1">
+                            <a href="{% url 'evento_update' evento.id %}" class="buttonEvento">
                                  Editar
                             </a>
-                            <a href="{% url 'evento_delete' evento.id %}" class="btn btn-sm btn-outline-danger me-1">
+                            <a href="{% url 'evento_delete' evento.id %}" class="buttonEvento">
                                  Excluir
                             </a>
                         {% endif %}
-                        <a href="{% url 'inscricao_create' %}" class="buttonInscricao">
-                             Inscrever-se
-                        </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
                     <td colspan="5" class="text-center text-muted py-3">
-                        Nenhum evento cadastrado.
+                        Nenhum evento cadastrado.''
                     </td>
                 </tr>
                 {% endfor %}

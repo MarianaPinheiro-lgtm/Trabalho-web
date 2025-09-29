@@ -11,17 +11,17 @@
             <table class="table table-hover align-middle text-center shadow-sm">
                 <thead class="table-primary text-dark">
                     <tr>
-                        <th class="py-3 px-4"> Evento</th>
-                        <th class="py-3 px-4"> Data</th>
-                        <th class="py-3 px-4"> Status</th>
-                        <th class="py-3 px-4"> Certificado</th>
+                        <th class="py-3 px-4"><strong>Evento</strong></th>
+                        <th class="py-3 px-4"><strong>Data</strong></th>
+                        <th class="py-3 px-4"><strong>Status</strong></th>
+                        <th class="py-3 px-4"><strong>Certificado</strong></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for inscricao in inscricoes %}
                     <tr>
-                        <td class="fw-semibold text-start ps-4">{{ inscricao.evento.nome }}</td>
-                        <td>{{ inscricao.evento.data_inicio|date:"d/m/Y" }}</td>
+                        <td class="fw-semibold text-start ps-4"><strong>{{ inscricao.evento.nome }}</strong></td>
+                        <td><strong>{{ inscricao.evento.data_inicio|date:"d/m/Y" }}</strong></td>
                         <td>
                             <span class="badge px-3 py-2 fs-6
                                 {% if inscricao.status == 'inscrito' %} bg-success
@@ -29,7 +29,7 @@
                                 {% elif inscricao.status == 'presente' %} bg-info
                                 {% else %} bg-secondary
                                 {% endif %}">
-                                {{ inscricao.get_status_display }}
+                                <strong>{{ inscricao.get_status_display }}</strong>
                             </span>
                         </td>
                         <td>

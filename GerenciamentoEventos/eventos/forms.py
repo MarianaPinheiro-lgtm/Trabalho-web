@@ -30,8 +30,9 @@ class RegistroForm(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirme sua senha'})
     )
     class Meta: 
-        model = User 
+        model = User
         fields = ['username', 'first_name', 'email', 'password']
+        help_texts= {'username': None} 
 
     email = forms.EmailField(required=True)
 
