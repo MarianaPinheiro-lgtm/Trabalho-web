@@ -85,9 +85,9 @@ class Inscricao(models.Model):
     def __str__(self):
         return f"{self.usuario.username} → {self.evento.nome} ({self.status})"
     def save(self, *args, **kwargs):
-        if self.evento.quantidade_participantes and self.evento.inscricoes.count() >= self.evento.quantidade_participantes:
-            raise ValueError("Limite de participantes atingido!")
-        super().save(*args, **kwargs)
+     if self.evento.quantidade_participantes and self.evento.inscricoes.count() >= self.evento.quantidade_participantes:
+        raise ValidationError("Limite de participantes atingido!")
+     super(Inscricao, self).save(*args, **kwargs)  # ou super().save(*args, **kwargs)
 class Certificado(models.Model):
     inscricao = models.OneToOneField(Inscricao, on_delete=models.CASCADE)
     data_emissao = models.DateTimeField(auto_now_add=True)

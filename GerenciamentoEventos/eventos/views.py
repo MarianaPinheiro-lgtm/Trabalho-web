@@ -9,6 +9,9 @@ from django.contrib.auth.views import LoginView as AuthLoginView
 from django.views.generic import TemplateView, CreateView,  UpdateView, DeleteView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Perfil, Evento, Inscricao, Certificado
+from django.core.exceptions import ValidationError
+from django.contrib import messages
+
 
 class RegistroView(FormView):
     template_name = 'registro.html'          # Template onde está o formulário
@@ -93,7 +96,11 @@ class InscricaoCreateView(CreateView):
     def form_valid(self, form):
  # associa automaticamente o usuário logado
         form.instance.usuario = self.request.user
-        return super().form_valid(form)
+        try:
+            return super().form_valid(form)
+        except ValidationError as e:
+            form.add_error(None, e.message)  # mostra o erro no HTML
+            return self.form_invalid(form)
 class InscricaoListView(ListView):
     model = Inscricao
     template_name = "inscricao_list.html"
