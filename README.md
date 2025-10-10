@@ -30,21 +30,14 @@ Emissão de certificados
 
 Autenticação de usuários 
 
-Tecnologias Utilizadas:  
+Tecnologias Utilizadas:
 
-   1- Python 
-
+  1- Python 
   2- Django 5.2.7 
-
   3- SQLite3 
-
   4- HTML5 / CSS3 
-
   5- Visual Studio Code 
-
   6- Git e GitHub 
-
- 
 
 Estrutura do Projeto: 
 
@@ -106,48 +99,25 @@ Estrutura do Projeto:
   
   ├── manage.py 
   
-  └── README.md 
-
- 
-
-	 
-
- 
+  └── README.md  
 
 Como Executar o Projeto: 
 
- 
-
 	1- Clonar repositório: 
-
 	Utilize, por meio do git bash, o comando: git clone (“url do repositório”). E em 	seguida o comando: cd Trabalho-web. Para acessar a pasta do projeto. 
 
- 
-
 	2- Criar e ativar um ambiente virtual: 
-
 	Para Windows, utilize os comandos, na pasta do projeto: python -m venv venv. E 	após: venv\Scripts\activate  
-
-	Já para Linux: python3 -m venv venv. E após: source venv/bin/activate 
-
-	 
+	Já para Linux: python3 -m venv venv. E após: source venv/bin/activate  
 
 	3- Instalando o Django: 
-
 	Utilize, dentro da pasta venv, por meio do cmd, o comando: pip install django. 	Para instalar o Django. 
-
- 
 
 	4- Executar migrações: 
 	Utilize o comando “python manage.py migrate” para realizar as migrações. 
 
-	 
-
 	5-Rodar servidor: 
 	Utiliza o comando “python manage.py runserver” para rodar o servidor. 
 
-	 
-
 	6- Acessar o sistema: 
-
 	Acesse o sistema pelo IP e porta recomendados pelo Django, após o comando 	de rodar o servidor. 
