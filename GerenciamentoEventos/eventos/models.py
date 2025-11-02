@@ -44,6 +44,7 @@ class Evento(models.Model):
         on_delete=models.CASCADE,
         related_name="eventos_organizados"
     )
+    banner = models.ImageField(upload_to='banners/', blank=True, null=True)  
 
     def __str__(self):
         return f"{self.nome} - {self.tipo}"

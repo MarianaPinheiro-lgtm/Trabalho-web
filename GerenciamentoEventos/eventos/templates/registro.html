@@ -1,52 +1,127 @@
 
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    {% extends 'baseSemLogin.html' %}
+{% extends 'baseSemLogin.html' %}
 
 {% block title %}Registrar{% endblock %}
 
 {% block content %}
 <div class="form-container">
     <h2>Crie sua conta</h2>
-    <form method="post">
+
+    <form id="registroForm" method="post" novalidate>
         {% csrf_token %}
         {{ form.as_p }}
+
         <button type="submit">Registrar</button>
     </form>
+
     <p class="redirect">
         Já tem conta? <a href="{% url 'login' %}">Entrar</a>
     </p>
+
+    <div id="msgErro" class="erro"></div>
 </div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+
+    // Máscara de telefone
+    $("input[name='telefone']").on("input", function () {
+        let val = $(this).val().replace(/\D/g, '');
+        if (val.length > 11) val = val.slice(0, 11);
+        if (val.length > 6) {
+            $(this).val("(" + val.slice(0, 2) + ") " + val.slice(2, 7) + "-" + val.slice(7));
+        } else if (val.length > 2) {
+            $(this).val("(" + val.slice(0, 2) + ") " + val.slice(2));
+        } else {
+            $(this).val(val);
+        }
+    });
+
+    // Validação antes de enviar o formulário
+    $("#registroForm").on("submit", function(e) {
+        let erros = [];
+
+        const nome = $("input[name='first_name']").val().trim();
+        const sobrenome = $("input[name='last_name']").val().trim();
+        const usuario = $("input[name='username']").val().trim();
+        const email = $("input[name='email']").val().trim();
+        const telefone = $("input[name='telefone']").val().trim();
+        const instituicao = $("input[name='instituicao']").val().trim();
+        const perfil = $("select[name='perfil']").val();
+        const senha = $("input[name='senha']").val();
+        const confirmar = $("input[name='confirmar_senha']").val();
+
+        // Nome e usuário obrigatórios
+        if (!nome) erros.push("O campo Nome é obrigatório.");
+        if (!usuario) erros.push("O campo Usuário é obrigatório.");
+
+        // Email válido
+        const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+        if (!emailRegex.test(email)) erros.push("Informe um e-mail válido.");
+
+        // Telefone válido
+        if (!/\(\d{2}\) \d{5}-\d{4}/.test(telefone)) erros.push("Telefone deve estar no formato (XX) XXXXX-XXXX.");
+
+        // Instituição obrigatória se for aluno/professor
+        if ((perfil === "aluno" || perfil === "professor") && !instituicao) {
+            erros.push("Instituição é obrigatória para alunos e professores.");
+        }
+
+        // Senha mínima e confirmação
+        if (senha.length < 6) erros.push("A senha deve ter pelo menos 6 caracteres.");
+        if (senha !== confirmar) erros.push("As senhas não coincidem.");
+
+        if (erros.length > 0) {
+            e.preventDefault();
+            $("#msgErro").html(erros.join("<br>")).css("color", "red");
+        } else {
+            $("#msgErro").html("Enviando dados...").css("color", "green");
+        }
+    });
+});
+</script>
 
 <style>
     .form-container {
-        max-width: 400px;
-        margin: auto;
-        text-align: center;
+        max-width: 420px;
+        margin: 40px auto;
+        padding: 25px;
+        border-radius: 10px;
+        background: #f8f8f8;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     .form-container h2 {
-        margin-bottom: 20px;
         color: #2c3e50;
+        text-align: center;
+        margin-bottom: 20px;
     }
 
     .form-container form {
         text-align: left;
     }
 
-    .form-container button {
+    button {
         width: 100%;
         margin-top: 10px;
-        font-size: 1rem;
+        padding: 8px;
+        background: #27ae60;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #219150;
     }
 
     .redirect {
-        margin-top: 15px;
-        font-size: 0.9rem;
+        text-align: center;
+        margin-top: 10px;
     }
 
     .redirect a {
@@ -55,32 +130,10 @@
         text-decoration: none;
     }
 
-    .redirect a:hover {
-        text-decoration: underline;
+    .erro {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 0.9rem;
     }
 </style>
 {% endblock %}
-
-</head>
-<body>
-
-<header>
-    <h1>Eventos Acadêmicos</h1>
-</header>
-
-<main>
-    <h2>Registro</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Registrar</button>
-</form>
-<p>Já tem conta? <a href="{% url 'login' %}">Entrar</a></p>
-</main>
-
-<footer>
-    &copy; {{ year|default:"2025" }} Sistema de Eventos. Todos os direitos reservados.
-</footer>
-
-</body>
-</html>

@@ -9,7 +9,7 @@ class RegistroForm(forms.ModelForm):
     telefone = forms.CharField(
         max_length=15, 
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone'})
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Telefone','id':'telefone','name':'telefone'})
     )
     instituicao = forms.CharField(
         max_length=100, 
@@ -73,7 +73,7 @@ class EventoForm(forms.ModelForm):
             'nome', 'tipo', 'descricao',
             'data_inicio', 'data_fim',
             'horario_inicio', 'horario_fim',
-            'local', 'quantidade_participantes'
+            'local', 'quantidade_participantes','banner'
         ]
         widgets = {
             'data_inicio': forms.DateInput(
@@ -103,7 +103,14 @@ class EventoForm(forms.ModelForm):
         self.fields['data_fim'].input_formats = ['%d/%m/%Y']
         self.fields['horario_inicio'].input_formats = ['%H:%M']
         self.fields['horario_fim'].input_formats = ['%H:%M']
-
+def clean_banner(self):
+        banner = self.cleaned_data.get('banner')
+        if banner:
+            if not banner.content_type.startswith('image/'):
+                raise forms.ValidationError("O arquivo deve ser uma imagem (jpg, png, etc).")
+            if banner.size > 5*1024*1024:  # limite de 5MB
+                raise forms.ValidationError("A imagem não pode ter mais de 5MB.")
+        return banner
 
 class InscricaoForm(forms.ModelForm):
     class Meta:

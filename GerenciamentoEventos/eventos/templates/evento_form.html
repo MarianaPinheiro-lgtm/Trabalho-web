@@ -1,15 +1,101 @@
 {% extends 'base.html' %}
 
-{% block title %}{% if object %}Editar Evento{% else %}Criar Evento{% endif %}{% endblock %}
+{% block title %}
+    {% if object %}Editar Evento{% else %}Criar Evento{% endif %}
+{% endblock %}
 
 {% block content %}
 <h2>{% if object %}Editar{% else %}Criar{% endif %} Evento</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="buttonInscricao">{% if object %}Atualizar{% else %}Criar{% endif %}</button>
+    <!-- Pré-visualização do banner -->
+    <img id="preview-banner" 
+         src="{% if object and object.banner %}{{ object.banner.url }}{% endif %}" 
+         alt="Pré-visualização do banner"
+         style="max-width: 300px; display: {% if object and object.banner %}block{% else %}none{% endif %}; margin-top: 10px;">
+
+    <button type="submit" class="buttonInscricao">
+        {% if object %}Atualizar{% else %}Criar{% endif %}
+    </button>
 </form>
 
 <a href="{% url 'evento_list' %}" class="buttonInscricao">Voltar para lista de eventos</a>
+{% endblock %}
+
+{% block scripts %}
+    <!-- jQuery + jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.3/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+
+    <!-- Timepicker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css">
+
+    <script>
+    $(function() {
+        // 🗓️ Seletor de datas
+        $("#id_data_inicio, #id_data_fim").datepicker({
+            dateFormat: "dd/mm/yy",
+            changeMonth: true,
+            changeYear: true,
+            minDate: 0
+        });
+
+        // ⏰ Seletor de horas
+        $("#id_horario_inicio, #id_horario_fim").timepicker({
+            timeFormat: "HH:mm",
+            hourMin: 0,
+            hourMax: 23,
+            stepMinute: 5
+        });
+
+        // 🔍 Validação antes de enviar
+        $("form").on("submit", function(e) {
+            let dataInicio = $("#id_data_inicio").val();
+            let dataFim = $("#id_data_fim").val();
+            let horaInicio = $("#id_horario_inicio").val();
+            let horaFim = $("#id_horario_fim").val();
+
+            let erros = [];
+
+            if (!dataInicio || !dataFim) erros.push("Preencha as datas de início e fim.");
+            if (!horaInicio || !horaFim) erros.push("Preencha os horários de início e fim.");
+
+            // Comparar datas
+            if (dataInicio && dataFim) {
+                let partesIni = dataInicio.split("/");
+                let partesFim = dataFim.split("/");
+                let inicio = new Date(partesIni[2], partesIni[1]-1, partesIni[0]);
+                let fim = new Date(partesFim[2], partesFim[1]-1, partesFim[0]);
+
+                if (inicio > fim) {
+                    erros.push("A data de término não pode ser anterior à de início.");
+                }
+            }
+
+            if (erros.length > 0) {
+                e.preventDefault();
+                alert(erros.join("\n"));
+            }
+        });
+    $("#id_banner").on("change", function() {
+        const file = this.files[0];
+        const preview = $("#preview-banner");
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.attr("src", e.target.result);
+                preview.show();
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.hide();
+        }
+      });
+    });
+    </script>
 {% endblock %}
