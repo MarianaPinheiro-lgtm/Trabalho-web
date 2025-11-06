@@ -15,9 +15,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework.authtoken.views import obtain_auth_token
 
 from django.contrib.auth.views import LogoutView, LoginView
 from eventos.views import (
@@ -34,7 +35,7 @@ from eventos.views import (
 )
 urlpatterns = [
     path('admin/', admin.site.urls),
-      # Autenticação
+     # Autenticação
     path('registro/', RegistroView.as_view(), name='registro'),
     path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
@@ -52,8 +53,13 @@ urlpatterns = [
     # Inscrições
     path('inscricao/criar/', InscricaoCreateView.as_view(), name='inscricao_create'),
     path('inscricoes/', InscricaoListView.as_view(), name='minhas-inscricoes'),
+
     # Certificado
     path('certificado/<int:pk>/', CertificadoView.as_view(), name='certificado'),
+    
+    #API
+    path('api/', include('eventos.urls')),
+    path('api/token/', obtain_auth_token, name='api_token_auth'),
 
 ]
 if settings.DEBUG:

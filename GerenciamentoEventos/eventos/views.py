@@ -11,6 +11,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from .models import Perfil, Evento, Inscricao, Certificado
 from django.core.exceptions import ValidationError
 from django.contrib import messages
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from .models import Evento, Inscricao
+from .serializers import EventoSerializer, InscricaoSerializer
+from .throttles import ConsultaEventosThrottle, InscricaoEventosThrottle
+
 
 
 class RegistroView(FormView):
@@ -127,3 +135,31 @@ class CertificadoView(DetailView):
         context['certificado'] = certificado
         return context
 # Create your views here.
+
+#API 06/11 08:52
+
+class EventoViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Endpoint de leitura: lista e detalha eventos
+    """
+    queryset = Evento.objects.all().order_by('data_inicio')
+    serializer_class = EventoSerializer
+    throttle_classes = [ConsultaEventosThrottle]
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated], throttle_classes = [InscricaoEventosThrottle])
+    def inscrever(self, request, pk=None):
+        """
+        Endpoint: POST /api/eventos/<id>/inscrever/
+        Permite que um usuário autenticado se inscreva em um evento.
+        """
+        evento = self.get_object()
+        user = request.user
+
+        # Verifica se já está inscrito
+        if Inscricao.objects.filter(evento=evento, usuario=user).exists():
+            return Response({'detail': 'Você já está inscrito neste evento.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Cria inscrição
+        inscricao = Inscricao.objects.create(evento=evento, usuario=user)
+        serializer = InscricaoSerializer(inscricao)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
