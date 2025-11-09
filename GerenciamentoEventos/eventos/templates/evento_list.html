@@ -6,11 +6,7 @@
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold text-primary">Lista de Eventos</h2>
-        {% if user.is_authenticated and perfil.tipo == 'organizador' %}
-            <a href="{% url 'evento_create' %}" class="btn btn-success shadow-sm">
-                ➕ Criar Novo Evento
-            </a>
-        {% endif %}
+        
     </div>
 
     <div class="table-responsive">
@@ -21,6 +17,7 @@
                     <th scope="col" class="px-3 py-2">Tipo</th>
                     <th scope="col" class="px-3 py-2">Data Início</th>
                     <th scope="col" class="px-3 py-2">Local</th>
+                    <th scope="col" class="px-3 py-2">professor vinculado</th>
                     <th scope="col" class="px-3 py-2">Banner</th>
                     <th scope="col" class="px-3 py-2">Ações</th>
                     
@@ -33,6 +30,14 @@
                     <td class="text-muted"><strong>{{ evento.get_tipo_display }}</strong></td>
                     <td class="text-center"><strong>{{ evento.data_inicio|date:"d/m/Y" }}</strong></td>
                     <td class="text-muted"><strong>{{ evento.local }}</strong></td>
+                    <td class="text-muted">
+  {% if evento.professor %}
+    <strong>{{ evento.professor.username }}</strong>
+  {% else %}
+    <strong>Marcos</strong>
+  {% endif %}
+</td>
+
                     <td class="text-center">
     {% if evento.banner %}
         <img src="{{ evento.banner.url }}" alt="Banner {{ evento.nome }}" 
@@ -42,9 +47,11 @@
     {% endif %}
 </td>
                     <td class="text-center">
-                        <a href="{% url 'inscricao_create' %}" class="buttonEvento">
-                            Inscrever-se
-                       </a>
+                       {% if user != evento.organizador and perfil.tipo != 'organizador' %}
+                          <a href="{% url 'inscricao_create' %}" class="buttonEvento">
+                               Inscrever-se
+                           </a>
+                        {% endif %}
                         {% if user == evento.organizador %}
                             <a href="{% url 'evento_update' evento.id %}" class="buttonEvento">
                                  Editar
@@ -73,13 +80,17 @@
         background: linear-gradient(180deg, #e9f2ff, #d6e9ff);
         font-weight: 600;
         border-bottom: 2px solid #0d6efd !important;
+        text-align: center; /* centraliza cabeçalhos */
     }
     table td {
         vertical-align: middle;
-        padding: 0.75rem;
+        padding: 0.40rem;
+        text-align: center; /* centraliza dados */
     }
     table tr:hover td {
         background-color: #f8fbff;
     }
+
 </style>
+
 {% endblock %}

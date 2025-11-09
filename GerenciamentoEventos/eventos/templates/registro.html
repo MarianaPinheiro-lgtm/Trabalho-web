@@ -9,7 +9,53 @@
 
     <form id="registroForm" method="post" novalidate>
         {% csrf_token %}
-        {{ form.as_p }}
+        <p>
+            <label for="id_first_name">Nome:</label>
+            <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Digite seu nome" required>
+        </p>
+
+        
+        <p>
+            <label for="id_username">Usuário:</label>
+            <input type="text" name="username" id="id_username" class="form-control" placeholder="Escolha um usuário" required>
+        </p>
+
+        <p>
+            <label for="id_email">E-mail:</label>
+            <input type="email" name="email" id="id_email" class="form-control" placeholder="Digite seu e-mail" required>
+        </p>
+
+        <p>
+            <label for="id_telefone">Telefone:</label>
+            <input type="text" name="telefone" id="id_telefone" class="form-control" placeholder="(XX) XXXXX-XXXX" required>
+        </p>
+
+        <p>
+            <label for="id_instituicao">Instituição:</label>
+            <input type="text" name="instituicao" id="id_instituicao" class="form-control" placeholder="Digite sua instituição">
+        </p>
+
+        <p>
+            <label for="id_tipo">Perfil:</label>
+            <select name="tipo" id="id_tipo" class="form-control" required>
+                <option value="">Selecione</option>
+                <option value="aluno">Aluno</option>
+                <option value="professor">Professor</option>
+                <option value="outro">Outro</option>
+            </select>
+        </p>
+
+        <p>
+            <label for="id_password">Senha:</label>
+            <input type="password" name="password" id="id_password" class="form-control" placeholder="Digite sua senha" required>
+            <div id="testeSenha" style="margin-top:5px;"></div>
+        </p>
+
+        <p>
+            <label for="id_password_confirm">Confirmar senha:</label>
+            <input type="password" name="password_confirm" id="id_password_confirm" class="form-control" placeholder="Confirme sua senha" required>
+        </p>
+
 
         <button type="submit">Registrar</button>
     </form>
@@ -39,20 +85,28 @@ $(document).ready(function() {
             $(this).val(val);
         }
     });
+    $("#id_password").on("input", function() {
+        const senha = $(this).val();
+        const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
 
+        if (senhaForte.test(senha)) {
+            $("#testeSenha").text("Senha válida! ✅").css("color", "green");
+        } else {
+            $("#testeSenha").text("Senha fraca! ❌ Deve ter 8+ caracteres, letras, números e símbolos.").css("color", "red");
+        }
+    });
     // Validação antes de enviar o formulário
     $("#registroForm").on("submit", function(e) {
         let erros = [];
 
         const nome = $("input[name='first_name']").val().trim();
-        const sobrenome = $("input[name='last_name']").val().trim();
         const usuario = $("input[name='username']").val().trim();
         const email = $("input[name='email']").val().trim();
         const telefone = $("input[name='telefone']").val().trim();
         const instituicao = $("input[name='instituicao']").val().trim();
         const perfil = $("select[name='perfil']").val();
-        const senha = $("input[name='senha']").val();
-        const confirmar = $("input[name='confirmar_senha']").val();
+        const senha = $("input[name='password']").val();
+        const confirmar = $("input[name='password_confirm']").val();
 
         // Nome e usuário obrigatórios
         if (!nome) erros.push("O campo Nome é obrigatório.");
@@ -71,9 +125,16 @@ $(document).ready(function() {
         }
 
         // Senha mínima e confirmação
-        if (senha.length < 6) erros.push("A senha deve ter pelo menos 6 caracteres.");
-        if (senha !== confirmar) erros.push("As senhas não coincidem.");
+        // Senha forte: mínimo 8 caracteres, com letra, número e símbolo
+        const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
 
+        if (!senhaForte.test(senha)) {
+        erros.push("A senha deve ter no mínimo 8 caracteres e conter letras, números e caracteres especiais.");
+}
+
+        if (senha !== confirmar) {
+        erros.push("As senhas não coincidem.");
+}
         if (erros.length > 0) {
             e.preventDefault();
             $("#msgErro").html(erros.join("<br>")).css("color", "red");

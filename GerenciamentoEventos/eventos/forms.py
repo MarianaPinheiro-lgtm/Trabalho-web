@@ -73,7 +73,7 @@ class EventoForm(forms.ModelForm):
             'nome', 'tipo', 'descricao',
             'data_inicio', 'data_fim',
             'horario_inicio', 'horario_fim',
-            'local', 'quantidade_participantes','banner'
+            'local', 'quantidade_participantes','banner','professor'
         ]
         widgets = {
             'data_inicio': forms.DateInput(
@@ -103,7 +103,8 @@ class EventoForm(forms.ModelForm):
         self.fields['data_fim'].input_formats = ['%d/%m/%Y']
         self.fields['horario_inicio'].input_formats = ['%H:%M']
         self.fields['horario_fim'].input_formats = ['%H:%M']
-def clean_banner(self):
+        self.fields['professor'].queryset = User.objects.filter(perfil__tipo='professor')
+    def clean_banner(self):
         banner = self.cleaned_data.get('banner')
         if banner:
             if not banner.content_type.startswith('image/'):

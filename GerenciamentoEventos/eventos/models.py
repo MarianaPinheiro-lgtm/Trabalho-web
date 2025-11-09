@@ -44,6 +44,7 @@ class Evento(models.Model):
         on_delete=models.CASCADE,
         related_name="eventos_organizados"
     )
+    professor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     banner = models.ImageField(upload_to='banners/', blank=True, null=True)  
 
     def __str__(self):

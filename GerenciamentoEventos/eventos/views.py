@@ -53,6 +53,10 @@ class EventoCreateView(LoginRequiredMixin, CreateView):
     template_name = 'evento_form.html'
     success_url = reverse_lazy('evento_list')  # ou outro nome de view
     login_url = 'login'  # Redireciona se não estiver logado
+    def test_func(self):
+        # Só organizadores podem criar eventos
+        perfil = getattr(self.request.user, 'perfil', None)
+        return perfil and perfil.tipo == 'organizador'
 
     def form_valid(self, form):
         form.instance.organizador = self.request.user  # Define o organizador como o usuário logado

@@ -4,26 +4,21 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primary">Lista de Eventos</h2>
-        {% if user.is_authenticated and perfil.tipo == 'organizador' %}
-            <a href="{% url 'evento_create' %}" class="btn btn-success shadow-sm">
-                ➕ Criar Novo Evento
-            </a>
-        {% endif %}
-    </div>
+    <h2 class="fw-bold text-primary mb-4">Lista de Eventos</h2>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped align-middle shadow-sm">
             <thead class="table-primary text-center">
                 <tr>
-                    <th scope="col" class="px-3 py-2">Nome</th>
-                    <th scope="col" class="px-3 py-2">Tipo</th>
-                    <th scope="col" class="px-3 py-2">Data Início</th>
-                    <th scope="col" class="px-3 py-2">Local</th>
-                    <th scope="col" class="px-3 py-2">Banner</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Data Início</th>
+                    <th>Local</th>
+                    <th>Professor Vinculado</th>
+                    <th>Banner</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% for evento in eventos %}
                 <tr>
@@ -31,28 +26,24 @@
                     <td class="text-muted">{{ evento.get_tipo_display }}</td>
                     <td class="text-center">{{ evento.data_inicio|date:"d/m/Y" }}</td>
                     <td class="text-muted">{{ evento.local }}</td>
+
                     <td class="text-center">
-    {% if evento.banner %}
-        <img src="{{ evento.banner.url }}" alt="Banner {{ evento.nome }}" 
-             style="max-width: 100px; max-height: 60px; object-fit: cover; border-radius: 4px;">
-    {% else %}
-        <span class="text-muted">Sem banner</span>
-    {% endif %}
-</td>
+                        {{ evento.professor.username|default:"Marcos" }}
+                    </td>
+
                     <td class="text-center">
-                        {% if user == evento.organizador %}
-                            <a href="{% url 'evento_update' evento.id %}" class="btn btn-sm btn-outline-warning me-1">
-                                 Editar
-                            </a>
-                            <a href="{% url 'evento_delete' evento.id %}" class="btn btn-sm btn-outline-danger me-1">
-                                 Excluir
-                            </a>
+                        {% if evento.banner %}
+                            <img src="{{ evento.banner.url }}"
+                                 alt="Banner {{ evento.nome }}"
+                                 style="max-width: 100px; max-height: 60px; object-fit: cover; border-radius: 4px;">
+                        {% else %}
+                            <span class="text-muted">Sem banner</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center text-muted py-3">
+                    <td colspan="6" class="text-center text-muted py-3">
                         Nenhum evento cadastrado.
                     </td>
                 </tr>
@@ -61,6 +52,7 @@
         </table>
     </div>
 </div>
+
 
 <style>
     /* Deixa cada coluna mais destacada */

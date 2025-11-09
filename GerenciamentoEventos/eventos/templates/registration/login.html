@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -11,6 +12,11 @@
             margin: 0;
             padding: 0;
             color: #333;
+
+            /* Novo para centralizar tudo na tela */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
         header, footer {
@@ -20,27 +26,39 @@
         }
 
         header {
-            padding: 20px;
-            font-size: 1.3em;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+          background-color: #004080;
+          color: white;
+          text-align: center;
+          padding: 15px; /* reduzido */
+          box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        header img {
+    height: 45px;
+    margin-right: 8px;
         }
 
         footer {
-            padding: 12px;
+            background-color: #004080;
+            color: white;
+            text-align: center;
+            padding: 10px;
             font-size: 0.9em;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
         }
 
         main {
-            max-width: 420px;
-            margin: 80px auto;
-            padding: 30px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            flex-grow: 1; /* empurra o footer para baixo */
+    display: flex;
+    justify-content: center;
+    align-items: center;
         }
+        main > div {
+    max-width: 550px; /* era 420px */
+    width: 90%;       /* ajuda a ser responsivo */
+    padding: 40px;    /* aumenta espaço interno */
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
 
         h2 {
             text-align: center;
@@ -123,28 +141,32 @@
 <body>
 
 <header>
+    <img src="{% static 'img/logo_eventos_academicos.png' %}" >
     <h1>Eventos Acadêmicos</h1>
 </header>
 
 <main>
-    <h2>Login</h2>
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="id_username">Usuário</label>
-            <input type="text" name="username" id="id_username" required>
-        </div>
+    <div>
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_username">Usuário</label>
+                <input type="text" name="username" id="id_username" required>
+            </div>
 
-        <div class="form-group">
-            <label for="id_password">Senha</label>
-            <input type="password" name="password" id="id_password" required>
-        </div>
+            <div class="form-group">
+                <label for="id_password">Senha</label>
+                <input type="password" name="password" id="id_password" required>
+            </div>
 
-        <button type="submit">Entrar</button>
-    </form>
-    <p>Não tem conta? <a href="{% url 'registro' %}">Registrar</a></p>
+            <button type="submit">Entrar</button>
+        </form>
+        <p>Não tem conta? <a href="{% url 'registro' %}">Registrar</a></p>
+    </div>
 </main>
+
 
 <footer>
     &copy; {{ year|default:"2025" }} Sistema de Eventos. Todos os direitos reservados.
