@@ -34,8 +34,12 @@ from eventos.views import (
     CertificadoView
 )
 urlpatterns = [
+    #API
+    path('api/', include('eventos.urls')),
+    path('api/token/', obtain_auth_token, name='api_token_auth'),
+    
     path('admin/', admin.site.urls),
-     # Autenticação
+    # Autenticação
     path('registro/', RegistroView.as_view(), name='registro'),
     path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
@@ -57,9 +61,7 @@ urlpatterns = [
     # Certificado
     path('certificado/<int:pk>/', CertificadoView.as_view(), name='certificado'),
     
-    #API
-    path('api/', include('eventos.urls')),
-    path('api/token/', obtain_auth_token, name='api_token_auth'),
+   
 
 ]
 if settings.DEBUG:

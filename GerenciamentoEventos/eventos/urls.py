@@ -7,9 +7,10 @@ router = DefaultRouter()
 router.register(r'eventos', EventoViewSet, basename='evento')
 
 urlpatterns = [
+    path('', include(router.urls)),
+    path('inscricoes/', views.InscricaoListView.as_view(), name='api_inscricoes_list'),
     path('eventos/', views.EventoListView.as_view(), name='api_eventos_list'),
     path('eventos/<int:pk>/', views.EventoUpdateView.as_view(), name='api_evento_detail'),
-    path('inscricoes/', views.InscricaoListView.as_view(), name='api_inscricoes_list'),
     path('inscricoes/criar/', views.InscricaoCreateView.as_view(), name='api_inscricao_create'),
-    path('', include(router.urls)),
+    
 ]

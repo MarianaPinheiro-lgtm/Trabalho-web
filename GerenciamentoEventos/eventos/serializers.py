@@ -7,7 +7,7 @@ class EventoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Evento
-        fields = ['id', 'nome', 'data', 'local', 'organizador']
+        fields = ['id', 'nome', 'data_inicio', 'local', 'organizador']
 
 
 class InscricaoSerializer(serializers.ModelSerializer):

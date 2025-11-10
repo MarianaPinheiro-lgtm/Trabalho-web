@@ -121,6 +121,9 @@ class InscricaoListView(ListView):
     def get_queryset(self):
         # mostra só as inscrições do usuário logado
         return Inscricao.objects.filter(usuario=self.request.user)
+    
+
+
 class CertificadoView(DetailView):
     model = Inscricao
     template_name = "certificado.html"
@@ -149,6 +152,11 @@ class EventoViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Evento.objects.all().order_by('data_inicio')
     serializer_class = EventoSerializer
     throttle_classes = [ConsultaEventosThrottle]
+    
+    def get_queryset(self):
+        # Filter articles to only show those belonging to the current user
+        print("Deu certo!")
+        return Evento.objects.all().order_by('data_inicio')
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated], throttle_classes = [InscricaoEventosThrottle])
     def inscrever(self, request, pk=None):
@@ -167,3 +175,11 @@ class EventoViewSet(viewsets.ReadOnlyModelViewSet):
         inscricao = Inscricao.objects.create(evento=evento, usuario=user)
         serializer = InscricaoSerializer(inscricao)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+#inscricoes API
+
+class InscricaoViewSet(viewsets.ModelViewSet):
+    queryset = Inscricao.objects.all()
+    serializer_class = InscricaoSerializer
+    Permission_classes = [IsAuthenticated]
+    throttle_classes = [InscricaoEventosThrottle]
