@@ -18,6 +18,8 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Evento, Inscricao
 from .serializers import EventoSerializer, InscricaoSerializer
 from .throttles import ConsultaEventosThrottle, InscricaoEventosThrottle
+from django.core.mail import send_mail
+from django.http import HttpResponse
 
 
 
@@ -183,3 +185,14 @@ class InscricaoViewSet(viewsets.ModelViewSet):
     serializer_class = InscricaoSerializer
     Permission_classes = [IsAuthenticated]
     throttle_classes = [InscricaoEventosThrottle]
+
+#envio de email
+
+def teste_email(request):
+    send_mail(
+        'Testando envio',
+        'Este é um email de teste enviado pelo Django.',
+        'hugo.martins@sempreceub.com',
+        ['joao.loliveira@sempreceub.com'],  # pode enviar para você mesmo
+    )
+    return HttpResponse("E-mail enviado!")

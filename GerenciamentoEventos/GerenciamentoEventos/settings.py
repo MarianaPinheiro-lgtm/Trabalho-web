@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'eventos',
+
 ]
 
 MIDDLEWARE = [
@@ -96,6 +97,15 @@ REST_FRAMEWORK = {
         'inscricao_eventos': '50/day',
     }
 }
+
+#Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'hugo.martins@sempreceub.com'
+EMAIL_HOST_PASSWORD = 'nqbhqhnbvudfawcp'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

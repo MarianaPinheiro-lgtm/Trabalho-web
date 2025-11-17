@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework.authtoken.views import obtain_auth_token
+from eventos.views import teste_email
 
 from django.contrib.auth.views import LogoutView, LoginView
 from eventos.views import (
@@ -31,18 +32,21 @@ from eventos.views import (
     EventoListView2,
     InscricaoCreateView,
     InscricaoListView,
-    CertificadoView
+    CertificadoView,
 )
 urlpatterns = [
     #API
     path('api/', include('eventos.urls')),
     path('api/token/', obtain_auth_token, name='api_token_auth'),
-    
     path('admin/', admin.site.urls),
+
     # Autenticação
     path('registro/', RegistroView.as_view(), name='registro'),
     path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+
+    #Email
+    path('teste-email/', teste_email),
 
     # Perfil
     path('perfil/', PerfilView.as_view(), name='perfil'),
