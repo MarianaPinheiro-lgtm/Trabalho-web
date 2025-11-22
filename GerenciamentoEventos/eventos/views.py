@@ -20,6 +20,9 @@ from .serializers import EventoSerializer, InscricaoSerializer
 from .throttles import ConsultaEventosThrottle, InscricaoEventosThrottle
 from django.core.mail import send_mail
 from django.http import HttpResponse
+from .permissions import IsAlunoOrProfessor
+from .models import RegistroAuditoria
+from datetime import datetime
 
 
 
@@ -31,6 +34,11 @@ class RegistroView(FormView):
     def form_valid(self, form):
         user = form.save()                   # Salva o usuário e o perfil
         login(self.request, user)            # Faz login automático após cadastro
+        
+        RegistroAuditoria.objects.create(
+            usuario=user, # O próprio usuário que acabou de entrar
+            acao="Novo usuário cadastrado no sistema"
+        )
         return super().form_valid(form)
 
 class LoginView(AuthLoginView):
@@ -49,7 +57,7 @@ class PerfilView(LoginRequiredMixin, TemplateView):
         context['perfil'] = perfil
         return context
 
-class EventoCreateView(LoginRequiredMixin, CreateView):
+class EventoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Evento
     form_class = EventoForm
     template_name = 'evento_form.html'
@@ -61,8 +69,18 @@ class EventoCreateView(LoginRequiredMixin, CreateView):
         return perfil and perfil.tipo == 'organizador'
 
     def form_valid(self, form):
-        form.instance.organizador = self.request.user  # Define o organizador como o usuário logado
-        return super().form_valid(form)
+        # 1. Define o organizador (Obrigatório antes de salvar)
+        form.instance.organizador = self.request.user
+        
+        # 2. Salva o evento no banco de dados
+        response = super().form_valid(form)
+        
+        RegistroAuditoria.objects.create(
+            usuario=self.request.user,
+            acao=f"Criou o evento: {form.instance.nome}"
+        )
+        return response
+
 class EventoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Evento
     form_class = EventoForm
@@ -70,12 +88,20 @@ class EventoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     success_url = reverse_lazy('evento_list')  # ou onde quiser redirecionar
 
     def form_valid(self, form):
-        form.instance.organizador = self.request.user  # mantém o organizador
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        
+        # --- LOG: ALTERAÇÃO DE EVENTO ---
+        RegistroAuditoria.objects.create(
+            usuario=self.request.user,
+            acao=f"Alterou dados do evento: {self.object.nome}"
+        )
+        return response
 
     def test_func(self):
         evento = self.get_object()
         return self.request.user == evento.organizador  # só o organizador pode editar
+    
+
 class EventoDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Evento
     template_name = 'evento_confirm_delete.html'
@@ -84,7 +110,19 @@ class EventoDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def test_func(self):
         evento = self.get_object()
         return self.request.user == evento.organizador  # só o organizador pode excluir
+    
+    def form_valid(self, form):
+        # Pega o nome antes de deletar para salvar no log
+        nome_evento = self.object.nome
+        response = super().form_valid(form)
         
+        # --- LOG: EXCLUSÃO DE EVENTO ---
+        RegistroAuditoria.objects.create(
+            usuario=self.request.user,
+            acao=f"Excluiu o evento: {nome_evento}"
+        )
+        return response
+    
 class EventoListView(ListView):
     model = Evento
     template_name = 'evento_list.html'  # Caminho para o template
@@ -97,16 +135,23 @@ class EventoListView2(ListView):
     context_object_name = 'eventos'     # Nome da variável usada no template
     ordering = ['data_inicio']          # Ordena os eventos por data de início
 
-class InscricaoCreateView(CreateView):
+class InscricaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Inscricao
     form_class = InscricaoForm
     template_name = "inscricao_form.html"
     success_url = reverse_lazy("minhas-inscricoes")  # redireciona após salvar
     
+    # ✅ NOVO: Restrição para Organizadores
+    def test_func(self):
+        perfil = getattr(self.request.user, 'perfil', None)
+        # Permite acesso se o usuário NÃO for um organizador.
+        return perfil and perfil.tipo != 'organizador'
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['usuario'] = self.request.user  # passa o usuário para o formulário
         return kwargs
+    
     def form_valid(self, form):
  # associa automaticamente o usuário logado
         form.instance.usuario = self.request.user
@@ -141,6 +186,14 @@ class CertificadoView(DetailView):
         # Cria o certificado se não existir
         certificado, created = Certificado.objects.get_or_create(inscricao=self.object)
 
+        # --- LOG: CONSULTA/GERAÇÃO DE CERTIFICADO ---
+        # Só grava o log se o request for GET (visualização)
+        # Evita duplicação excessiva, mas garante rastreio
+        RegistroAuditoria.objects.create(
+            usuario=self.request.user,
+            acao=f"Consultou/Gerou certificado do evento: {self.object.evento.nome}"
+        )
+
         context['certificado'] = certificado
         return context
 # Create your views here.
@@ -160,7 +213,7 @@ class EventoViewSet(viewsets.ReadOnlyModelViewSet):
         print("Deu certo!")
         return Evento.objects.all().order_by('data_inicio')
 
-    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated], throttle_classes = [InscricaoEventosThrottle])
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated, IsAlunoOrProfessor], throttle_classes = [InscricaoEventosThrottle])
     def inscrever(self, request, pk=None):
         """
         Endpoint: POST /api/eventos/<id>/inscrever/
@@ -169,14 +222,37 @@ class EventoViewSet(viewsets.ReadOnlyModelViewSet):
         evento = self.get_object()
         user = request.user
 
+        #LÓGICA DE VAGAS ADD 
+        if evento.vagas_disponiveis is not None and evento.vagas_disponiveis <= 0:
+                    return Response({'detail': 'Vagas esgotadas neste evento.'}, status=status.HTTP_400_BAD_REQUEST)
+
         # Verifica se já está inscrito
         if Inscricao.objects.filter(evento=evento, usuario=user).exists():
             return Response({'detail': 'Você já está inscrito neste evento.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Cria inscrição
         inscricao = Inscricao.objects.create(evento=evento, usuario=user)
+        RegistroAuditoria.objects.create(
+            usuario=user,
+            acao=f"Inscreveu-se no evento: {evento.nome}"
+        )
         serializer = InscricaoSerializer(inscricao)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    # Sobrescreve o método que pega UM evento específico
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        
+        # --- LOG: CONSULTA VIA API ---
+        if request.user.is_authenticated:
+            RegistroAuditoria.objects.create(
+                usuario=request.user,
+                acao=f"API: Consultou detalhes do evento ID {instance.id} ({instance.nome})"
+            )
+        # -----------------------------
+        
+        return super().retrieve(request, *args, **kwargs)
+
     
 #inscricoes API
 
@@ -196,3 +272,43 @@ def teste_email(request):
         ['joao.loliveira@sempreceub.com'],  # pode enviar para você mesmo
     )
     return HttpResponse("E-mail enviado!")
+
+class AuditoriaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    model = RegistroAuditoria
+    template_name = 'auditoria_list.html'
+    context_object_name = 'registros'
+    paginate_by = 20 
+
+    def test_func(self):
+        perfil = getattr(self.request.user, 'perfil', None)
+        return perfil and perfil.tipo == 'organizador'
+
+    def get_queryset(self):
+        # Pega todos os registros ordenados por data (mais recente primeiro)
+        qs = RegistroAuditoria.objects.all().order_by('-data_hora')
+        
+        # --- FILTROS ---
+        data_busca = self.request.GET.get('data_busca')
+        usuario_busca = self.request.GET.get('usuario_busca')
+
+        # Filtro por Data
+        if data_busca:
+            try:
+                # Converte string 'YYYY-MM-DD' para data e filtra
+                data_obj = datetime.strptime(data_busca, '%Y-%m-%d').date()
+                qs = qs.filter(data_hora__date=data_obj)
+            except ValueError:
+                pass # Se a data for inválida, ignora
+
+        # Filtro por Usuário (busca parcial no username)
+        if usuario_busca:
+            qs = qs.filter(usuario__username__icontains=usuario_busca)
+            
+        return qs
+
+    # Passa os valores atuais para o template (para o campo não limpar após busca)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['data_busca'] = self.request.GET.get('data_busca', '')
+        context['usuario_busca'] = self.request.GET.get('usuario_busca', '')
+        return context

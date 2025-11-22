@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Auditoria{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="mb-4">
+        <h2 class="fw-bold text-primary mb-3">Registros de Auditoria</h2>
+        
+        <div class="card p-4 shadow-sm border-0 bg-light">
+            <form method="get" class="row g-3 align-items-end">
+                
+                <div class="col-md-4">
+                    <label for="data_busca" class="form-label fw-bold text-secondary">Filtrar por Data:</label>
+                    <input type="date" class="form-control" id="data_busca" name="data_busca" 
+                           value="{{ data_busca }}">
+                </div>
+
+                <div class="col-md-4">
+                    <label for="usuario_busca" class="form-label fw-bold text-secondary">Filtrar por Usuário:</label>
+                    <input type="text" class="form-control" id="usuario_busca" name="usuario_busca" 
+                           placeholder="Digite o nome do usuário..." value="{{ usuario_busca }}">
+                </div>
+
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                        Buscar
+                    </button>
+                    <a href="{% url 'auditoria_list' %}" class="btn btn-outline-secondary w-50">
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+        </div>
+
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped align-middle shadow-sm">
+            <thead class="table-primary text-center">
+                <tr>
+                    <th scope="col" class="px-3 py-2" style="width: 20%;">Data/Hora</th>
+                    <th scope="col" class="px-3 py-2" style="width: 20%;">Usuário</th>
+                    <th scope="col" class="px-3 py-2" style="width: 60%;">Ação Realizada</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for registro in registros %}
+                <tr>
+                    <td class="text-center"><strong>{{ registro.data_hora|date:"d/m/Y H:i" }}</strong></td>
+                    <td class="fw-semibold text-dark">{{ registro.usuario.username }}</td>
+                    <td class="text-muted">{{ registro.acao }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="text-center text-muted py-3">
+                        Nenhum registro encontrado com os filtros selecionados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        {% if is_paginated %}
+        <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&data_busca={{ data_busca }}&usuario_busca={{ usuario_busca }}">Anterior</a></li>
+                    {% endif %}
+                    <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+                    {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&data_busca={{ data_busca }}&usuario_busca={{ usuario_busca }}">Próxima</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    table th { background: linear-gradient(180deg, #e9f2ff, #d6e9ff); font-weight: 600; border-bottom: 2px solid #0d6efd !important; text-align: center; }
+    table td { vertical-align: middle; padding: 0.55rem; text-align: center; }
+    table tr:hover td { background-color: #f8fbff; }
+</style>
+{% endblock %}

@@ -17,7 +17,7 @@
         
         <p>
             <label for="id_username">Usuário:</label>
-            <input type="text" name="username" id="id_username" class="form-control" placeholder="Escolha um usuário" required>
+            <input type="text" name="username" id="id_username" class="form-control" placeholder="Nome de usuário" required>
         </p>
 
         <p>
@@ -90,9 +90,9 @@ $(document).ready(function() {
         const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
 
         if (senhaForte.test(senha)) {
-            $("#testeSenha").text("Senha válida! ✅").css("color", "green");
+            $("#testeSenha").text("Senha válida!").css("color", "green");
         } else {
-            $("#testeSenha").text("Senha fraca! ❌ Deve ter 8+ caracteres, letras, números e símbolos.").css("color", "red");
+            $("#testeSenha").text("Senha fraca! Deve ter 8+ caracteres, letras, números e símbolos.").css("color", "red");
         }
     });
     // Validação antes de enviar o formulário

@@ -4,10 +4,12 @@
 
 {% block content %}
 <h2>Confirmação da inscrição</h2>
+
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="buttonInscricao">Inscrever</button>
+    <a href="{% url 'evento_list' %}" class="buttonInscricao">Cancelar</a>
 </form>
 <a href="{% url 'minhas-inscricoes' %}" class="buttonInscricao">Ver minhas inscrições</a>
 {% endblock %}

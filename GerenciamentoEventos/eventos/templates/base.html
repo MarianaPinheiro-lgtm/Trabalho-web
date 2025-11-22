@@ -173,10 +173,16 @@
             {% else %}
                 <a href="{% url 'login' %}?next={% url 'perfil' %}" class="buttonH">Perfil</a>
             {% endif %}
+
             <a href="{% url 'evento_list' %}" class="buttonH">Eventos</a>
+
+            {% if user.is_authenticated and perfil and perfil.tipo == 'organizador' %}
+                <a href="{% url 'auditoria_list' %}" class="buttonH">Auditoria</a>
+            {% endif %}
             {% if user.is_authenticated and perfil and perfil.tipo != 'organizador' %}
              <a href="{% url 'minhas-inscricoes' %}" class="buttonH">Minhas Inscrições</a>
             {% endif %}
+
             {% if user.is_authenticated %}
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}

@@ -96,4 +96,15 @@ class Certificado(models.Model):
 
     def str(self):
         return f"Certificado de {self.inscricao.usuario.username} - {self.inscricao.evento.nome}"
-# Create your models here.
+
+#Auditoria
+class RegistroAuditoria(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    acao = models.CharField(max_length=255) # Ex: "Criou evento Python Day"
+    data_hora = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-data_hora'] # Mostra os mais recentes primeiro
+
+    def __str__(self):
+        return f"{self.usuario} - {self.acao} em {self.data_hora}"
