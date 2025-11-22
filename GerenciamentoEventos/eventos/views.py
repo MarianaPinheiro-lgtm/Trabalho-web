@@ -23,7 +23,7 @@ from django.http import HttpResponse
 from .permissions import IsAlunoOrProfessor
 from .models import RegistroAuditoria
 from datetime import datetime
-
+from django.shortcuts import get_object_or_404
 
 
 class RegistroView(FormView):
@@ -139,27 +139,56 @@ class InscricaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Inscricao
     form_class = InscricaoForm
     template_name = "inscricao_form.html"
-    success_url = reverse_lazy("minhas-inscricoes")  # redireciona após salvar
-    
-    # ✅ NOVO: Restrição para Organizadores
+    success_url = reverse_lazy("minhas-inscricoes")
+
+    # 1. Restrição de Organizador
     def test_func(self):
         perfil = getattr(self.request.user, 'perfil', None)
-        # Permite acesso se o usuário NÃO for um organizador.
         return perfil and perfil.tipo != 'organizador'
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs['usuario'] = self.request.user  # passa o usuário para o formulário
+        kwargs['usuario'] = self.request.user
         return kwargs
-    
+
+    # 2. NOVO: Manda os dados do Evento para o HTML
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Pega o ID que veio na URL (definido no urls.py como <int:evento_id>)
+        evento_id = self.kwargs.get('evento_id')
+        if evento_id:
+            # Busca o evento e coloca na variável 'evento' para o HTML usar
+            context['evento'] = get_object_or_404(Evento, pk=evento_id)
+        return context
+
+    # 3. Salva a inscrição, associa o evento e cria o Log
     def form_valid(self, form):
- # associa automaticamente o usuário logado
-        form.instance.usuario = self.request.user
         try:
-            return super().form_valid(form)
+            # Pega o evento pelo ID da URL
+            evento_id = self.kwargs.get('evento_id')
+            evento = get_object_or_404(Evento, pk=evento_id)
+
+            # Preenche os dados automáticos
+            form.instance.usuario = self.request.user
+            form.instance.evento = evento 
+
+            # Salva no Banco
+            response = super().form_valid(form)
+
+            # --- LOG DE AUDITORIA (Requisito de Segurança) ---
+            RegistroAuditoria.objects.create(
+                usuario=self.request.user,
+                acao=f"Inscreveu-se no evento: {evento.nome}"
+            )
+            # -------------------------------------------------
+
+            return response
+
         except ValidationError as e:
-            form.add_error(None, e.message)  # mostra o erro no HTML
+            form.add_error(None, e.message)
             return self.form_invalid(form)
+        
+    
 class InscricaoListView(ListView):
     model = Inscricao
     template_name = "inscricao_list.html"

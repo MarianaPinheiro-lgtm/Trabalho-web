@@ -25,6 +25,7 @@ urlpatterns = [
     # Auditoria (HTML - Adicionei conforme conversamos antes)
     path('auditoria/', views.AuditoriaListView.as_view(), name='auditoria_list'),
 
+    path('inscricoes/criar/<int:evento_id>/', views.InscricaoCreateView.as_view(), name='inscricao_create'),
 
     # =========================================
     # 🤖 ROTAS DA API (JSON / Mobile)

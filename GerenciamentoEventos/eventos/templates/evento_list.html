@@ -48,7 +48,7 @@
 </td>
                     <td class="text-center">
                        {% if user != evento.organizador and perfil.tipo != 'organizador' %}
-                          <a href="{% url 'inscricao_create' %}" class="buttonEvento">
+                          <a href="{% url 'inscricao_create' evento.id %}" class="buttonEvento">
                                Inscrever-se
                            </a>
                         {% endif %}
