@@ -15,6 +15,8 @@ class Perfil(models.Model):
     telefone = models.CharField(max_length=15, blank=True)
     instituicao = models.CharField(max_length=255, blank=True)
     tipo = models.CharField(max_length=20, choices=TIPOS)
+    codigo_acesso = models.CharField(max_length=6, blank=True, null=True)
+    confirmado = models.BooleanField(default=False)
 
     def clean(self):
         if self.tipo in ['aluno', 'professor'] and not self.instituicao:
@@ -100,11 +102,11 @@ class Certificado(models.Model):
 #Auditoria
 class RegistroAuditoria(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    acao = models.CharField(max_length=255) # Ex: "Criou evento Python Day"
+    acao = models.CharField(max_length=255)
     data_hora = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-data_hora'] # Mostra os mais recentes primeiro
+        ordering = ['-data_hora']
 
     def __str__(self):
         return f"{self.usuario} - {self.acao} em {self.data_hora}"

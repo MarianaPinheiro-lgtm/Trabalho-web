@@ -26,11 +26,6 @@ urlpatterns = [
     path('auditoria/', views.AuditoriaListView.as_view(), name='auditoria_list'),
 
     path('inscricoes/criar/<int:evento_id>/', views.InscricaoCreateView.as_view(), name='inscricao_create'),
-
-    # =========================================
-    # 🤖 ROTAS DA API (JSON / Mobile)
-    # =========================================
-    # Todas as rotas do router ficarão acessíveis em: /api/eventos/
     
     path('api/', include(router.urls)),
 ]

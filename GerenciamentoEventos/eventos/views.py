@@ -24,6 +24,9 @@ from .permissions import IsAlunoOrProfessor
 from .models import RegistroAuditoria
 from datetime import datetime
 from django.shortcuts import get_object_or_404
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+import random
 
 
 class RegistroView(FormView):
@@ -33,12 +36,16 @@ class RegistroView(FormView):
 
     def form_valid(self, form):
         user = form.save()                   # Salva o usuário e o perfil
+        codigo_acesso = str(random.randint(100000, 999999))
+        user.profile.codigo_acesso = codigo_acesso
         login(self.request, user)            # Faz login automático após cadastro
         
         RegistroAuditoria.objects.create(
             usuario=user, # O próprio usuário que acabou de entrar
+            codigo_acesso = codigo_acesso,
             acao="Novo usuário cadastrado no sistema"
         )
+        enviar_email_boas_vindas(user, codigo_acesso)
         return super().form_valid(form)
 
 class LoginView(AuthLoginView):
@@ -293,14 +300,22 @@ class InscricaoViewSet(viewsets.ModelViewSet):
 
 #envio de email
 
-def teste_email(request):
-    send_mail(
-        'Testando envio',
-        'Este é um email de teste enviado pelo Django.',
-        'hugo.martins@sempreceub.com',
-        ['joao.loliveira@sempreceub.com'],  # pode enviar para você mesmo
+def enviar_email_boas_vindas(usuario, codigo_acesso):
+    assunto = "Bem-vindo à nossa plataforma!"
+    mensagem = render_to_string("emails/boas_vindas_email.html", {
+        "usuario": usuario,
+        "codigo_acesso": codigo_acesso,
+    })
+    destinatario = [usuario.email]
+
+    email = EmailMessage(
+        assunto,
+        mensagem,
+        to=destinatario
     )
-    return HttpResponse("E-mail enviado!")
+    email.content_subtype = "html"
+    email.send()
+    
 
 class AuditoriaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     model = RegistroAuditoria
