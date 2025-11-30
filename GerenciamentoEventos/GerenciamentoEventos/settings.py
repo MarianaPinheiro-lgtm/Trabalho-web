@@ -105,7 +105,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'hugo.martins@sempreceub.com'
 EMAIL_HOST_PASSWORD = 'nqbhqhnbvudfawcp'
-DEFAULT_FROM_EMAIL = 'Hugolas <hugo.martins@sempreceub.com>'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

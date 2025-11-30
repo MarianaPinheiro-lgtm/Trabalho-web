@@ -18,13 +18,16 @@
   </head>
   <body>
     <div class="container">
+
       <div class="logo">
-        <img src="{% static 'img/logo_eventos_academicos.png' %}"  alt="SGEA Logo" width="150">
+        <img src="" width="150">
       </div>
+
       <h2>Bem-vindo, {{ usuario.first_name }}!</h2>
       <p>Estamos felizes em ter você no <strong>SGEA</strong>.</p>
-      <p>Para acessar o sistema, clique no botão abaixo ou use o código de acesso:</p>
-      <p><strong>Código de acesso:</strong> {{ usuario.codigo_acesso }}</p>
+      <p>Para confirmar seu registro, digite o código de acesso abaixo no campo em nosso site:</p>
+      <p><strong>Código de acesso:</strong> {{ codigo_acesso }}</p>
+
     </div>
   </body>
 </html>

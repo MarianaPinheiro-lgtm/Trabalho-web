@@ -32,6 +32,8 @@ from eventos.views import (
     InscricaoCreateView,
     InscricaoListView,
     CertificadoView,
+    validar_codigo
+
 )
 urlpatterns = [
     #API
@@ -60,6 +62,9 @@ urlpatterns = [
 
     # Certificado
     path('certificado/<int:pk>/', CertificadoView.as_view(), name='certificado'),
+
+    path('validar-codigo/', validar_codigo, name='validar_codigo_email'),
+
     
    
 

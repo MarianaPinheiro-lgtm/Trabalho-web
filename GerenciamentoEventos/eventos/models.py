@@ -11,7 +11,7 @@ class Perfil(models.Model):
         ('professor', 'Professor'),
         ('organizador', 'Organizador'),
     ]
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     telefone = models.CharField(max_length=15, blank=True)
     instituicao = models.CharField(max_length=255, blank=True)
     tipo = models.CharField(max_length=20, choices=TIPOS)
@@ -92,12 +92,15 @@ class Inscricao(models.Model):
      if self.evento.quantidade_participantes and self.evento.inscricoes.count() >= self.evento.quantidade_participantes:
         raise ValidationError("Limite de participantes atingido!")
      super(Inscricao, self).save(*args, **kwargs)  # ou super().save(*args, **kwargs)
+
+
 class Certificado(models.Model):
     inscricao = models.OneToOneField(Inscricao, on_delete=models.CASCADE)
     data_emissao = models.DateTimeField(auto_now_add=True)
 
     def str(self):
         return f"Certificado de {self.inscricao.usuario.username} - {self.inscricao.evento.nome}"
+
 
 #Auditoria
 class RegistroAuditoria(models.Model):

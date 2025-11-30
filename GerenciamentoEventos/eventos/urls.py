@@ -28,4 +28,5 @@ urlpatterns = [
     path('inscricoes/criar/<int:evento_id>/', views.InscricaoCreateView.as_view(), name='inscricao_create'),
     
     path('api/', include(router.urls)),
+
 ]

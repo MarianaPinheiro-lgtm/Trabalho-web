@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+   <h2>Validação de Código de Acesso</h2>
+   
+  {% if messages %}
+  <div>
+      {% for message in messages %}
+          <p style="color: red;">{{ message }}</p>
+      {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+    {{ form.as_p }} <!--Renderiza o formulário automaticamente na tag p-->
+    <button type="submit">Validar</button>
+  </form>
+{% endblock %}

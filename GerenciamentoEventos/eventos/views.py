@@ -1,6 +1,4 @@
-from django.shortcuts import render
-from django.shortcuts import render
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import FormView
 from django.urls import reverse_lazy
 from django.contrib.auth import login
@@ -27,22 +25,24 @@ from django.shortcuts import get_object_or_404
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 import random
+from .forms import ValidarCodigoEmailForm
 
 
 class RegistroView(FormView):
     template_name = 'registro.html'          # Template onde está o formulário
     form_class = RegistroForm                # Usa o RegistroForm que você criou
-    success_url = reverse_lazy('perfil')     # Para onde redirecionar após cadastro
+    success_url = reverse_lazy('validar_codigo_email')     # Para onde redirecionar após cadastro
 
     def form_valid(self, form):
+        print("OLHA AQUI")
         user = form.save()                   # Salva o usuário e o perfil
         codigo_acesso = str(random.randint(100000, 999999))
         user.profile.codigo_acesso = codigo_acesso
+        user.profile.save()
         login(self.request, user)            # Faz login automático após cadastro
         
         RegistroAuditoria.objects.create(
             usuario=user, # O próprio usuário que acabou de entrar
-            codigo_acesso = codigo_acesso,
             acao="Novo usuário cadastrado no sistema"
         )
         enviar_email_boas_vindas(user, codigo_acesso)
@@ -302,7 +302,7 @@ class InscricaoViewSet(viewsets.ModelViewSet):
 
 def enviar_email_boas_vindas(usuario, codigo_acesso):
     assunto = "Bem-vindo à nossa plataforma!"
-    mensagem = render_to_string("emails/boas_vindas_email.html", {
+    mensagem = render_to_string("boas_vindas_email.html", {
         "usuario": usuario,
         "codigo_acesso": codigo_acesso,
     })
@@ -356,3 +356,25 @@ class AuditoriaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         context['data_busca'] = self.request.GET.get('data_busca', '')
         context['usuario_busca'] = self.request.GET.get('usuario_busca', '')
         return context
+    
+
+#Validar código do email
+def validar_codigo(request):
+    perfil = request.user.profile
+    if request.method == "POST":
+        form = ValidarCodigoEmailForm(request.POST)
+        if form.is_valid():
+            codigo_digitado = form.cleaned_data['codigo_acesso']
+
+            if codigo_digitado == perfil.codigo_acesso:
+                perfil.confirmado = True
+                perfil.save()
+                messages.success(request, "Código válido! Bem-vindo ao sistema.")
+                return redirect("perfil")  # redireciona após validação
+            else:
+                messages.error(request, "Código incorreto. Tente novamente.")
+    else:
+        form = ValidarCodigoEmailForm()
+
+    return render(request, "validar_codigo_email.html", {"form": form})
+        

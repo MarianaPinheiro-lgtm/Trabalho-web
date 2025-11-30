@@ -146,3 +146,11 @@ class CertificadoForm(forms.ModelForm):
         widgets = {
             'inscricao': forms.Select(attrs={'class': 'form-control'})
         }
+
+#Formulário para validação de email
+
+class ValidarCodigoEmailForm(forms.Form):
+    codigo_acesso = forms.CharField(
+        max_length=6,
+        label="Digite o código de acesso recebido por e-mail"
+    )
