@@ -170,30 +170,27 @@ class InscricaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
     # 3. Salva a inscrição, associa o evento e cria o Log
     def form_valid(self, form):
-        try:
-            # Pega o evento pelo ID da URL
-            evento_id = self.kwargs.get('evento_id')
-            evento = get_object_or_404(Evento, pk=evento_id)
+            usuario = self.request.user
+            evento = get_object_or_404(Evento, pk=self.kwargs.get('evento_id'))
 
-            # Preenche os dados automáticos
-            form.instance.usuario = self.request.user
-            form.instance.evento = evento 
+            # Checa duplicata
+            if Inscricao.objects.filter(usuario=usuario, evento=evento).exists():
+                messages.error(self.request, "Você já está inscrito neste evento.")
+                return redirect("minhas-inscricoes")
 
-            # Salva no Banco
+            # Cria inscrição
+            form.instance.usuario = usuario
+            form.instance.evento = evento
             response = super().form_valid(form)
 
-            # --- LOG DE AUDITORIA (Requisito de Segurança) ---
+            # Registra auditoria
             RegistroAuditoria.objects.create(
-                usuario=self.request.user,
+                usuario=usuario,
                 acao=f"Inscreveu-se no evento: {evento.nome}"
             )
-            # -------------------------------------------------
 
+            messages.success(self.request, f"Inscrição no evento {evento.nome} realizada com sucesso!")
             return response
-
-        except ValidationError as e:
-            form.add_error(None, e.message)
-            return self.form_invalid(form)
         
     
 class InscricaoListView(ListView):
@@ -205,6 +202,8 @@ class InscricaoListView(ListView):
         # mostra só as inscrições do usuário logado
         return Inscricao.objects.filter(usuario=self.request.user)
     
+
+
 
 
 class CertificadoView(DetailView):
@@ -295,8 +294,39 @@ class EventoViewSet(viewsets.ReadOnlyModelViewSet):
 class InscricaoViewSet(viewsets.ModelViewSet):
     queryset = Inscricao.objects.all()
     serializer_class = InscricaoSerializer
-    Permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]  # cuidado: é 'permission_classes', não 'Permission_classes'
     throttle_classes = [InscricaoEventosThrottle]
+
+    def create(self, request, *args, **kwargs):
+        usuario = request.user
+        evento_id = kwargs.get("pk") or request.data.get("evento")
+
+        if not evento_id:
+            return Response({"erro": "Evento não informado."}, status=400)
+
+        # Verifica se o evento existe
+        try:
+            evento = Evento.objects.get(id=evento_id)
+        except Evento.DoesNotExist:
+            return Response({"erro": "Evento não encontrado."}, status=404)
+
+        # Verificar duplicata
+        if Inscricao.objects.filter(usuario=usuario, evento=evento).exists():
+            return Response(
+                {"erro": "Você já está inscrito neste evento."},
+                status=400
+            )
+
+        # Criar normalmente
+        serializer = self.get_serializer(data={
+            "usuario": usuario.id,
+            "evento": evento.id
+        })
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response(serializer.data, status=201)
+
 
 #envio de email
 

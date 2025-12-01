@@ -116,10 +116,7 @@ class EventoForm(forms.ModelForm):
 class InscricaoForm(forms.ModelForm):
     class Meta:
         model = Inscricao
-        fields = ['evento']  # usuário vem da view, não do form
-        widgets = {
-            'evento': forms.Select(attrs={'class': 'form-control'})
-        }
+        fields = []
 
     def __init__(self, *args, **kwargs):
         self.usuario = kwargs.pop('usuario', None)

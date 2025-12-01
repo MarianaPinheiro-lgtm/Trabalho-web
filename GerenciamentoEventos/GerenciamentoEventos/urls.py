@@ -57,17 +57,13 @@ urlpatterns = [
     path('evento/<int:pk>/excluir/', EventoDeleteView.as_view(), name='evento_delete'),
 
     # Inscrições
-    path('inscricao/criar/', InscricaoCreateView.as_view(), name='inscricao_create'),
+    path('inscricao/criar/<int:evento_id>/', InscricaoCreateView.as_view(), name='inscricao_create'),
     path('inscricoes/', InscricaoListView.as_view(), name='minhas-inscricoes'),
 
     # Certificado
     path('certificado/<int:pk>/', CertificadoView.as_view(), name='certificado'),
 
     path('validar-codigo/', validar_codigo, name='validar_codigo_email'),
-
-    
-   
-
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
