@@ -34,11 +34,10 @@ class RegistroView(FormView):
     success_url = reverse_lazy('validar_codigo_email')     # Para onde redirecionar após cadastro
 
     def form_valid(self, form):
-        print("OLHA AQUI")
         user = form.save()                   # Salva o usuário e o perfil
         codigo_acesso = str(random.randint(100000, 999999))
-        user.profile.codigo_acesso = codigo_acesso
-        user.profile.save()
+        user.perfil.codigo_acesso = codigo_acesso
+        user.perfil.save()
         login(self.request, user)            # Faz login automático após cadastro
         
         RegistroAuditoria.objects.create(

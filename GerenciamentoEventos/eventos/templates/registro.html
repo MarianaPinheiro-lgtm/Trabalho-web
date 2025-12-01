@@ -7,55 +7,80 @@
 <div class="form-container">
     <h2>Crie sua conta</h2>
 
+    {% if form.non_field_errors %}
+    <div class="alert-error">
+        {{ form.non_field_errors }}
+    </div>
+    {% endif %}
+
     <form id="registroForm" method="post" novalidate>
         {% csrf_token %}
-        <p>
-            <label for="id_first_name">Nome:</label>
-            <input type="text" name="first_name" id="id_first_name" class="form-control" placeholder="Digite seu nome" required>
-        </p>
-
         
         <p>
+            <label for="id_first_name">Nome:</label>
+            <input type="text" name="first_name" id="id_first_name" class="form-control" 
+                   placeholder="Digite seu nome" required
+                   value="{{ form.first_name.value|default_if_none:'' }}">
+            <div class="backend-error">{{ form.first_name.errors }}</div>
+        </p>
+
+        <p>
             <label for="id_username">Usuário:</label>
-            <input type="text" name="username" id="id_username" class="form-control" placeholder="Nome de usuário" required>
+            <input type="text" name="username" id="id_username" class="form-control" 
+                   placeholder="Nome de usuário" required
+                   value="{{ form.username.value|default_if_none:'' }}">
+            <div class="backend-error">{{ form.username.errors }}</div>
         </p>
 
         <p>
             <label for="id_email">E-mail:</label>
-            <input type="email" name="email" id="id_email" class="form-control" placeholder="Digite seu e-mail" required>
+            <input type="email" name="email" id="id_email" class="form-control" 
+                   placeholder="Digite seu e-mail" required
+                   value="{{ form.email.value|default_if_none:'' }}">
+            <div class="backend-error">{{ form.email.errors }}</div>
         </p>
 
         <p>
             <label for="id_telefone">Telefone:</label>
-            <input type="text" name="telefone" id="id_telefone" class="form-control" placeholder="(XX) XXXXX-XXXX" required>
+            <input type="text" name="telefone" id="id_telefone" class="form-control" 
+                   placeholder="(XX) XXXXX-XXXX" required
+                   value="{{ form.telefone.value|default_if_none:'' }}">
+            <div class="backend-error">{{ form.telefone.errors }}</div>
         </p>
 
         <p>
             <label for="id_instituicao">Instituição:</label>
-            <input type="text" name="instituicao" id="id_instituicao" class="form-control" placeholder="Digite sua instituição">
+            <input type="text" name="instituicao" id="id_instituicao" class="form-control" 
+                   placeholder="Digite sua instituição"
+                   value="{{ form.instituicao.value|default_if_none:'' }}">
+            <div class="backend-error">{{ form.instituicao.errors }}</div>
         </p>
 
         <p>
             <label for="id_tipo">Perfil:</label>
             <select name="tipo" id="id_tipo" class="form-control" required>
                 <option value="">Selecione</option>
-                <option value="aluno">Aluno</option>
-                <option value="professor">Professor</option>
-                <option value="organizador">Organizador</option>
+                <option value="aluno" {% if form.tipo.value == 'aluno' %}selected{% endif %}>Aluno</option>
+                <option value="professor" {% if form.tipo.value == 'professor' %}selected{% endif %}>Professor</option>
+                <option value="organizador" {% if form.tipo.value == 'organizador' %}selected{% endif %}>Organizador</option>
             </select>
+            <div class="backend-error">{{ form.tipo.errors }}</div>
         </p>
 
         <p>
             <label for="id_password">Senha:</label>
-            <input type="password" name="password" id="id_password" class="form-control" placeholder="Digite sua senha" required>
-            <div id="testeSenha" style="margin-top:5px;"></div>
+            <input type="password" name="password" id="id_password" class="form-control" 
+                   placeholder="Digite sua senha" required>
+            <div id="testeSenha" style="margin-top:5px; font-size: 0.85rem;"></div>
+            <div class="backend-error">{{ form.password.errors }}</div>
         </p>
 
         <p>
             <label for="id_password_confirm">Confirmar senha:</label>
-            <input type="password" name="password_confirm" id="id_password_confirm" class="form-control" placeholder="Confirme sua senha" required>
+            <input type="password" name="password_confirm" id="id_password_confirm" class="form-control" 
+                   placeholder="Confirme sua senha" required>
+            <div class="backend-error">{{ form.password_confirm.errors }}</div>
         </p>
-
 
         <button type="submit">Registrar</button>
     </form>
@@ -71,130 +96,119 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-$(document).ready(function() {
-
-    // Máscara de telefone
-    $("input[name='telefone']").on("input", function () {
-        let val = $(this).val().replace(/\D/g, '');
-        if (val.length > 11) val = val.slice(0, 11);
-        if (val.length > 6) {
-            $(this).val("(" + val.slice(0, 2) + ") " + val.slice(2, 7) + "-" + val.slice(7));
-        } else if (val.length > 2) {
-            $(this).val("(" + val.slice(0, 2) + ") " + val.slice(2));
-        } else {
-            $(this).val(val);
-        }
+    $(document).ready(function() {
+        // Máscara de telefone (mantida igual)
+        $("input[name='telefone']").on("input", function () {
+            let val = $(this).val().replace(/\D/g, '');
+            if (val.length > 11) val = val.slice(0, 11);
+            if (val.length > 6) {
+                $(this).val("(" + val.slice(0, 2) + ") " + val.slice(2, 7) + "-" + val.slice(7));
+            } else if (val.length > 2) {
+                $(this).val("(" + val.slice(0, 2) + ") " + val.slice(2));
+            } else {
+                $(this).val(val);
+            }
+        });
+    
+        // Teste de força da senha (mantido igual)
+        $("#id_password").on("input", function() {
+            const senha = $(this).val();
+            const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
+            if (senhaForte.test(senha)) {
+                $("#testeSenha").text("Senha válida!").css("color", "green");
+            } else {
+                $("#testeSenha").text("Senha fraca! Deve ter 8+ caracteres, letras, números e símbolos.").css("color", "red");
+            }
+        });
+    
+        // Validação do Formulário
+        $("#registroForm").on("submit", function(e) {
+            let erros = [];
+            
+            // Limpa erros anteriores do Backend ao tentar enviar de novo
+            $(".backend-error").empty(); 
+    
+            const nome = $("input[name='first_name']").val().trim();
+            const usuario = $("input[name='username']").val().trim();
+            const email = $("input[name='email']").val().trim();
+            const telefone = $("input[name='telefone']").val().trim();
+            const instituicao = $("input[name='instituicao']").val().trim();
+            
+            // CORREÇÃO AQUI: O nome do campo no HTML é 'tipo', não 'perfil'
+            const perfil = $("select[name='tipo']").val(); 
+            
+            const senha = $("input[name='password']").val();
+            const confirmar = $("input[name='password_confirm']").val();
+    
+            if (!nome) erros.push("O campo Nome é obrigatório.");
+            if (!usuario) erros.push("O campo Usuário é obrigatório.");
+    
+            const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+            if (!emailRegex.test(email)) erros.push("Informe um e-mail válido.");
+    
+            // Validação simples de formato de telefone
+            if (telefone.length < 14) erros.push("Telefone inválido.");
+    
+            if ((perfil === "aluno" || perfil === "professor") && !instituicao) {
+                erros.push("Instituição é obrigatória para alunos e professores.");
+            }
+            
+            if (!perfil) erros.push("Selecione um perfil.");
+    
+            const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
+            if (!senhaForte.test(senha)) {
+                erros.push("A senha deve ter no mínimo 8 caracteres e conter letras, números e caracteres especiais.");
+            }
+    
+            if (senha !== confirmar) {
+                erros.push("As senhas não coincidem.");
+            }
+    
+            if (erros.length > 0) {
+                e.preventDefault(); // Impede o envio se houver erro no JS
+                // Mostra os erros em vermelho
+                $("#msgErro").html(erros.join("<br>")).css("color", "#dc3545").show();
+            } else {
+                $("#msgErro").html("Enviando dados...").css("color", "green");
+                // Deixa o formulário ser enviado para o Django validar o resto
+            }
+        });
     });
-    $("#id_password").on("input", function() {
-        const senha = $(this).val();
-        const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
-
-        if (senhaForte.test(senha)) {
-            $("#testeSenha").text("Senha válida!").css("color", "green");
-        } else {
-            $("#testeSenha").text("Senha fraca! Deve ter 8+ caracteres, letras, números e símbolos.").css("color", "red");
-        }
-    });
-    // Validação antes de enviar o formulário
-    $("#registroForm").on("submit", function(e) {
-        let erros = [];
-
-        const nome = $("input[name='first_name']").val().trim();
-        const usuario = $("input[name='username']").val().trim();
-        const email = $("input[name='email']").val().trim();
-        const telefone = $("input[name='telefone']").val().trim();
-        const instituicao = $("input[name='instituicao']").val().trim();
-        const perfil = $("select[name='perfil']").val();
-        const senha = $("input[name='password']").val();
-        const confirmar = $("input[name='password_confirm']").val();
-
-        // Nome e usuário obrigatórios
-        if (!nome) erros.push("O campo Nome é obrigatório.");
-        if (!usuario) erros.push("O campo Usuário é obrigatório.");
-
-        // Email válido
-        const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-        if (!emailRegex.test(email)) erros.push("Informe um e-mail válido.");
-
-        // Telefone válido
-        if (!/\(\d{2}\) \d{5}-\d{4}/.test(telefone)) erros.push("Telefone deve estar no formato (XX) XXXXX-XXXX.");
-
-        // Instituição obrigatória se for aluno/professor
-        if ((perfil === "aluno" || perfil === "professor") && !instituicao) {
-            erros.push("Instituição é obrigatória para alunos e professores.");
-        }
-
-        // Senha mínima e confirmação
-        // Senha forte: mínimo 8 caracteres, com letra, número e símbolo
-        const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%#?&*])[A-Za-z\d@$!%*#?&]{8,}$/;
-
-        if (!senhaForte.test(senha)) {
-        erros.push("A senha deve ter no mínimo 8 caracteres e conter letras, números e caracteres especiais.");
-}
-
-        if (senha !== confirmar) {
-        erros.push("As senhas não coincidem.");
-}
-        if (erros.length > 0) {
-            e.preventDefault();
-            $("#msgErro").html(erros.join("<br>")).css("color", "red");
-        } else {
-            $("#msgErro").html("Enviando dados...").css("color", "green");
-        }
-    });
-});
-</script>
+    </script>
 
 <style>
-    .form-container {
-        max-width: 420px;
-        margin: 40px auto;
-        padding: 25px;
-        border-radius: 10px;
-        background: #f8f8f8;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    /* ... Seu CSS anterior ... */
+
+    /* Estilo para erros vindos do Django (abaixo de cada input) */
+    .backend-error {
+        color: #dc3545; /* Vermelho padrão de erro */
+        font-size: 0.85rem;
+        margin-top: 2px;
+        list-style: none; /* Remove bolinhas da lista se o Django renderizar ul */
+    }
+    
+    /* Remove formatação de lista padrão do Django dentro do erro */
+    .backend-error ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
     }
 
-    .form-container h2 {
-        color: #2c3e50;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .form-container form {
-        text-align: left;
-    }
-
-    button {
-        width: 100%;
-        margin-top: 10px;
-        padding: 8px;
-        background: #27ae60;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    button:hover {
-        background: #219150;
-    }
-
-    .redirect {
-        text-align: center;
-        margin-top: 10px;
-    }
-
-    .redirect a {
-        color: #27ae60;
-        font-weight: bold;
-        text-decoration: none;
-    }
-
+    /* Estilo para o container de erros gerais do JS */
     .erro {
+        background-color: #ffe6e6;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        padding: 10px;
+        border-radius: 5px;
         margin-top: 15px;
-        text-align: center;
-        font-size: 0.9rem;
+        display: none; /* Oculto por padrão, JS mostra se necessário */
+    }
+    
+    /* Quando é apenas mensagem de sucesso/envio */
+    .erro[style*="green"] {
+        background-color: #e6fffa;
+        border: 1px solid green;
     }
 </style>
 {% endblock %}
