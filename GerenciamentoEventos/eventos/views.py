@@ -324,7 +324,7 @@ class AuditoriaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     paginate_by = 20 
 
     def test_func(self):
-        perfil = getattr(self.request.user, 'perfil', None)
+        perfil = getattr(self.request.user, 'profile', None)
         return perfil and perfil.tipo == 'organizador'
 
     def get_queryset(self):

@@ -57,6 +57,8 @@ class Evento(models.Model):
         if self.quantidade_participantes:
             return self.quantidade_participantes - self.inscricoes.count()
         return None
+    
+    
 class Inscricao(models.Model):
     STATUS = [
         ('inscrito', 'Inscrito'),
