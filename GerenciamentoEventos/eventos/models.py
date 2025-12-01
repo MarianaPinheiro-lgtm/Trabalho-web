@@ -11,7 +11,7 @@ class Perfil(models.Model):
         ('professor', 'Professor'),
         ('organizador', 'Organizador'),
     ]
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name="perfil")
     telefone = models.CharField(max_length=15, blank=True)
     instituicao = models.CharField(max_length=255, blank=True)
     tipo = models.CharField(max_length=20, choices=TIPOS)
