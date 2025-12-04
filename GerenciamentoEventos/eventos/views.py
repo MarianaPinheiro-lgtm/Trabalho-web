@@ -163,8 +163,30 @@ class InscricaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         # Pega o ID que veio na URL (definido no urls.py como <int:evento_id>)
         evento_id = self.kwargs.get('evento_id')
         if evento_id:
-            # Busca o evento e coloca na variável 'evento' para o HTML usar
-            context['evento'] = get_object_or_404(Evento, pk=evento_id)
+            evento = get_object_or_404(Evento, pk=evento_id)
+            context['evento'] = evento
+
+            user = self.request.user
+
+            # Já inscrito?
+            context['usuario_ja_inscrito'] = Inscricao.objects.filter(
+                usuario=user,
+                evento=evento,
+                status='inscrito'
+            ).exists()
+
+
+            inscritos_ativos = evento.inscricoes.filter(status='inscrito').count()
+            # Se quantidade_participantes for None/0 => sem limite
+            if evento.quantidade_participantes:
+                context['evento_cheio'] = inscritos_ativos >= evento.quantidade_participantes
+            else:
+                context['evento_cheio'] = False
+        else:
+        # Se não houver evento_id, evita erro
+            context['evento'] = None
+            context['evento_cheio'] = False
+
         return context
 
     # 3. Salva a inscrição, associa o evento e cria o Log
@@ -180,7 +202,18 @@ class InscricaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             # Cria inscrição
             form.instance.usuario = usuario
             form.instance.evento = evento
-            response = super().form_valid(form)
+            inscritos_ativos = evento.inscricoes.filter(status='inscrito').count()
+            if evento.quantidade_participantes and inscritos_ativos >= evento.quantidade_participantes:
+                messages.error(self.request, "Limite de participantes atingido!")
+                # Reapresenta o form com a mensagem (não redireciona)
+                return self.form_invalid(form)
+
+            # Tenta salvar — caso o modelo ainda lance ValidationError por concorrência, tratamos
+            try:
+                response = super().form_valid(form)
+            except ValidationError as e:
+                messages.error(self.request, e.message if hasattr(e, 'message') else str(e))
+                return self.form_invalid(form)
 
             # Registra auditoria
             RegistroAuditoria.objects.create(
@@ -190,6 +223,7 @@ class InscricaoCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
             messages.success(self.request, f"Inscrição no evento {evento.nome} realizada com sucesso!")
             return response
+    
         
     
 class InscricaoListView(ListView):

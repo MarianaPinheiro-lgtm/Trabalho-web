@@ -1,5 +1,6 @@
 {% block content %}
-<div style="height: 100vh; display: flex; justify-content: center; align-items: center; background: #f0f4ff; font-family: 'Poppins', Arial, sans-serif;">
+<div style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #f0f4ff; font-family: 'Poppins', Arial, sans-serif;">
+
     <div class="card shadow-lg text-center"
          style="max-width: 900px; width: 100%; padding: 60px; border: 6px solid #0d6efd; border-radius: 30px; background: #fff;">
         
@@ -29,5 +30,14 @@
             <em>Emitido em {{ certificado.data_emissao|date:"d/m/Y H:i" }}</em>
         </div>
     </div>
+
+    <!-- Botão de voltar -->
+    <a href="javascript:history.back()" 
+    class="btn btn-primary mt-4"
+    style="padding: 12px 40px; font-size: 1.1rem; border-radius: 12px;">
+     Voltar
+ </a>
+ 
+
 </div>
 {% endblock %}

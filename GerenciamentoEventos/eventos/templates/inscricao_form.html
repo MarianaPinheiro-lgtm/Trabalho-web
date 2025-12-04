@@ -5,14 +5,61 @@
 {% block content %}
 <h2>Confirmação da inscrição</h2>
 
+{# Mensagens do Django (sucesso / erro) #}
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
+
 <p>Evento: <strong>{{ evento.nome }}</strong></p>
 <p>Data: {{ evento.data_inicio|date:"d/m/Y" }}</p>
 <p>Local: {{ evento.local }}</p>
 
-<form method="post">
+{% if usuario_ja_inscrito %}
+<div style="
+    background:#e3f2ff;
+    border-left:6px solid #0d6efd;
+    padding:16px;
+    border-radius:8px;
+    font-size:1.1rem;
+    font-weight:600;
+    color:#003d80;
+    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+">
+    Você já está inscrito neste evento.
+</div>
+<br>
+{% endif %}
+
+{# Mostra aviso se o limite já foi atingido (cheio) #}
+{% if evento_cheio %}
+
+
+    <div style="
+        background:#fff3cd;
+        border-left:6px solid #ffca2c;
+        padding:16px;
+        border-radius:8px;
+        font-size:1.1rem;
+        font-weight:600;
+        color:#5c4600;
+        box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    ">
+        Limite de participantes atingido — inscrições encerradas.
+    </div>
+<br>
+{% endif %}
+
+<form method="post" novalidate>
     {% csrf_token %}
-    {{ form.as_p}}
-    <button href="{% url 'inscricao_create' evento.id %}" type="submit" class="buttonInscricao">Confirmar Inscrição</button>
+    {{ form.as_p }}
+    {# se evento_cheio, botão desabilitado #}
+    <button type="submit" class="buttonInscricao" {% if evento_cheio %}disabled title="Evento cheio"{% endif %}>
+        Confirmar Inscrição
+    </button>
 </form>
 
 <a href="{% url 'evento_list' %}" class="buttonInscricao">Cancelar</a>
