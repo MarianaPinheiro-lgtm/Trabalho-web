@@ -26,6 +26,11 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 import random
 from .forms import ValidarCodigoEmailForm
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from email.mime.image import MIMEImage
 
 
 class RegistroView(FormView):
@@ -364,20 +369,37 @@ class InscricaoViewSet(viewsets.ModelViewSet):
 #envio de email
 
 def enviar_email_boas_vindas(usuario, codigo_acesso):
-    assunto = "Bem-vindo à nossa plataforma!"
-    mensagem = render_to_string("boas_vindas_email.html", {
+    # Renderiza HTML do template
+    html_content = render_to_string("boas_vindas_email.html", {
         "usuario": usuario,
         "codigo_acesso": codigo_acesso,
     })
-    destinatario = [usuario.email]
 
-    email = EmailMessage(
-        assunto,
-        mensagem,
-        to=destinatario
+    # Versão texto puro
+    text_content = strip_tags(html_content)
+
+    email = EmailMultiAlternatives(
+        subject="Bem-vindo à nossa plataforma!",
+        body=text_content,
+        from_email=settings.EMAIL_HOST_USER,
+        to=[usuario.email],
     )
-    email.content_subtype = "html"
+
+    # Adiciona o HTML
+    email.attach_alternative(html_content, "text/html")
+
+    # Caminho da sua logo
+    logo_path = "eventos/static/img/logo_eventos_academicos.png"
+
+    # Anexa inline usando MIMEImage
+    with open(logo_path, "rb") as f:
+        img = MIMEImage(f.read())
+        img.add_header("Content-ID", "<logo_image>")
+        img.add_header("Content-Disposition", "inline", filename="logo.png")
+        email.attach(img)
+
     email.send()
+
     
 
 class AuditoriaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -423,7 +445,7 @@ class AuditoriaListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 #Validar código do email
 def validar_codigo(request):
-    perfil = request.user.profile
+    perfil = request.user.perfil
     if request.method == "POST":
         form = ValidarCodigoEmailForm(request.POST)
         if form.is_valid():
